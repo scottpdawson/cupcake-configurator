@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.8",
+    "@types/react-dom": "^16.9.4",
     "bootstrap": "^4.3.1",
     "jquery": "^3.3.1",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
-    "typescript": "^3.4.2"
+    "typescript": "^3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -25,5 +28,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@types/react": "^16.9.11"
+  }
 }

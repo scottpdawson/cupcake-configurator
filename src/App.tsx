@@ -1,31 +1,31 @@
-import React, { Component } from "react";
-import * as Constants from "./Constants";
+import * as React from 'react';
+import { initialState, order, orderItem, boxSize, boxSizes } from './Constants'
 import { generateUniqueKey } from "./Helpers";
 
-class App extends Component {
-  constructor(props) {
+
+
+class App extends React.Component<any, order> {
+  constructor(props: any) {
     super(props);
-    this.state = Constants.initialState;
-    this.addToOrder = this.addToOrder.bind(this);
-    this.removeFromOrder = this.removeFromOrder.bind(this);
+    this.state = initialState;
   }
 
   onStartOver = () => {
-    this.setState({ ...Constants.initialState });
+    this.setState({ ...initialState });
   };
 
   getCurrentOrder() {
     return JSON.parse(JSON.stringify(this.state.orderDetails));
   }
 
-  updateOrderDetails(orderDetails) {
+  updateOrderDetails(orderDetails: orderItem[]) {
     this.setState({
       orderTotal: this.calculateTotal(orderDetails),
       orderDetails: orderDetails
     });
   }
 
-  addToOrder(newItem) {
+  addToOrder(newItem: boxSize) {
     let currentOrder = this.getCurrentOrder();
     currentOrder.push({
       key: generateUniqueKey("CC"), // key is unique
@@ -35,16 +35,16 @@ class App extends Component {
     this.updateOrderDetails(currentOrder);
   }
 
-  removeFromOrder(itemToRemove) {
+  removeFromOrder(itemToRemove: string) {
     let currentOrder = this.getCurrentOrder();
-    let currentOrderItemRemoved = currentOrder.filter(function(item) {
+    let currentOrderItemRemoved = currentOrder.filter(function(item: orderItem) {
       return item.key !== itemToRemove;
     });
     this.updateOrderDetails(currentOrderItemRemoved);
   }
 
-  calculateTotal(orderDetails) {
-    var totalPrice = orderDetails.reduce(function(accumulator, order) {
+  calculateTotal(orderDetails: orderItem[]) {
+    var totalPrice = orderDetails.reduce(function(accumulator: number, order: orderItem) {
       return accumulator + order.price;
     }, 0);
     return totalPrice;
@@ -57,12 +57,12 @@ class App extends Component {
         <p>lorem ipsum instructions</p>
         <h4>Add to Order</h4>
         <ul>
-          {Object.keys(Constants.boxSizes).map((item, i) => (
+          {Object.keys(boxSizes).map((item, i) => (
             <li
-              onClick={e => this.addToOrder(Constants.boxSizes[item], e)}
+              onClick={e => this.addToOrder(boxSizes[i])}
               key={i}
             >
-              {Constants.boxSizes[item].name} ({Constants.boxSizes[item].count})
+              {boxSizes[i].name} ({boxSizes[i].count})
             </li>
           ))}
         </ul>
@@ -73,7 +73,7 @@ class App extends Component {
             <li key={item.key}>
               <button
                 type="button"
-                onClick={e => this.removeFromOrder(item.key, e)}
+                onClick={e => this.removeFromOrder(item.key)}
               >
                 remove
               </button>
