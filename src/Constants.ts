@@ -11,6 +11,7 @@ export const initialState = {
 export interface orderItem {
   key: string,
   name: string,
+  cakeFlavor: flavor,
   price: number,
 };
 
@@ -105,3 +106,5 @@ export const frostingFlavors: flavor[] = [{
     color: "#333"
   }
 ];
+
+export const defaultCakeFlavor = cakeFlavors[1];
