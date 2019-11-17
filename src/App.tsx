@@ -5,9 +5,12 @@ import {
   orderItem,
   boxSize,
   boxSizes,
-  flavor,
   cakeFlavors,
+  flavor,
+  frostingFlavors,
   defaultCakeFlavor,
+  defaultFrostingFlavor,
+  defaultNullFrostingFlavor,
 } from "./Constants";
 import { generateUniqueKey } from "./Helpers";
 
@@ -25,6 +28,10 @@ class App extends React.Component<any, order> {
     return JSON.parse(JSON.stringify(this.state.orderDetails));
   }
 
+  getOrderItemFromKey(currentOrder: orderItem[], key: string): orderItem | undefined {
+    return currentOrder.find((obj: { key: string }) => obj.key === key);
+  }
+
   updateOrderDetails(orderDetails: orderItem[]) {
     this.setState({
       orderTotal: this.calculateTotal(orderDetails),
@@ -38,7 +45,8 @@ class App extends React.Component<any, order> {
       key: generateUniqueKey("CC"), // key is unique
       name: newItem.name,
       cakeFlavor: defaultCakeFlavor,
-      price: newItem.price,
+      frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
+      price: newItem.price
     });
     this.updateOrderDetails(currentOrder);
   }
@@ -53,15 +61,28 @@ class App extends React.Component<any, order> {
     this.updateOrderDetails(currentOrderItemRemoved);
   }
 
-  getCakeFlavorFromString(flavor: string) {
-    return cakeFlavors.find(obj => obj.name == flavor);
+  getFlavorFromString(flavor: string, flavors: flavor[]) {
+    return flavors.find(obj => obj.name == flavor);
   }
 
-  updateCakeFlavor(e: any, keyToUpdate: string) {
+  updateCakeFlavor(e: any, orderItemToUpdate: string) {
     let currentOrder = this.getCurrentOrder();
-    let thisOrderItem = currentOrder.find((obj: { key: string; }) => obj.key === keyToUpdate);
-    thisOrderItem.cakeFlavor = this.getCakeFlavorFromString(e.target.value);
-    this.updateOrderDetails(currentOrder);
+    let thisOrderItem = this.getOrderItemFromKey(currentOrder, orderItemToUpdate);
+    let cakeFlavor = this.getFlavorFromString(e.target.value, cakeFlavors);
+    if (thisOrderItem && cakeFlavor) {
+      thisOrderItem.cakeFlavor = cakeFlavor;
+      this.updateOrderDetails(currentOrder);
+    }
+  }
+
+  updateFrostingFlavor(e: any, orderItemToUpdate: string, flavorIndex: number) {
+    let currentOrder = this.getCurrentOrder();
+    let thisOrderItem = this.getOrderItemFromKey(currentOrder, orderItemToUpdate);
+    let frostingFlavor = this.getFlavorFromString(e.target.value, frostingFlavors);
+    if (thisOrderItem && frostingFlavor) {
+      thisOrderItem.frostingFlavor[flavorIndex] = frostingFlavor;
+      this.updateOrderDetails(currentOrder);
+    }
   }
 
   calculateTotal(orderDetails: orderItem[]) {
@@ -95,8 +116,9 @@ class App extends React.Component<any, order> {
             <tr>
               <th></th>
               <th>Item</th>
-              <th>Cake Flavor</th>
-              <th>Frosting Flavor (choose up to 2)</th>
+              <th>Cake</th>
+              <th>Frosting</th>
+              <th>2nd Frosting (optional)</th>
             </tr>
           </thead>
           <tbody>
@@ -112,7 +134,10 @@ class App extends React.Component<any, order> {
                 </td>
                 <td>{item.name}</td>
                 <td>
-                  <select value={item.cakeFlavor.name} onChange={e => this.updateCakeFlavor(e, item.key)}>
+                  <select
+                    value={item.cakeFlavor && item.cakeFlavor.name}
+                    onChange={e => this.updateCakeFlavor(e, item.key)}
+                  >
                     {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                       <option key={i} value={cakeFlavors[i].name}>
                         {cakeFlavors[i].name}
@@ -120,7 +145,35 @@ class App extends React.Component<any, order> {
                     ))}
                   </select>
                 </td>
-                <td></td>
+                <td>
+                  <select
+                    value={item.frostingFlavor && item.frostingFlavor[0].name}
+                    onChange={e => this.updateFrostingFlavor(e, item.key, 0)}
+                  >
+                    {Object.keys(frostingFlavors).map((thisFlavor, i) => (
+                      <option key={i} value={frostingFlavors[i].name}>
+                        {frostingFlavors[i].name}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <select
+                    value={
+                      item.frostingFlavor[1] && item.frostingFlavor[1].name
+                    }
+                    onChange={e => this.updateFrostingFlavor(e, item.key, 1)}
+                  >
+                    {Object.keys(frostingFlavors).map((thisFlavor, i) => (
+                      <option
+                        key={i}
+                        value={frostingFlavors[i] && frostingFlavors[i].name}
+                      >
+                        {frostingFlavors[i].name}
+                      </option>
+                    ))}
+                  </select>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -135,10 +188,9 @@ class App extends React.Component<any, order> {
 
 // todo:
 //
-// 1. select frosting flavors (up to 2 per dozen)
-// 2. provide a message on cupcakes (custom disc color, letter color)
-// 3. delivery (extra charge) or pick-up
-// 4. send email on order quote submission, cc: to submitter
+// 1. provide a message on cupcakes (custom disc color, letter color)
+// 2. delivery (extra charge) or pick-up
+// 3. send email on order quote submission, cc: to submitter
 // https://sheelahb.com/blog/how-to-send-email-from-react-without-a-backend/
 //
 

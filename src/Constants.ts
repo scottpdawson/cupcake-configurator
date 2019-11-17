@@ -1,30 +1,31 @@
 export interface order {
-  orderTotal: number,
-  orderDetails: orderItem[],
+  orderTotal: number;
+  orderDetails: orderItem[];
 }
 
 export const initialState = {
   orderTotal: 0,
-  orderDetails: [],
+  orderDetails: []
 };
 
 export interface orderItem {
-  key: string,
-  name: string,
-  cakeFlavor: flavor,
-  price: number,
-};
+  key: string;
+  name: string;
+  cakeFlavor: flavor;
+  frostingFlavor: flavor[]; 
+  price: number;
+}
 
 export interface boxSize {
-  name: string,
-  count: number,
-  price: number,
-};
+  name: string;
+  count: number;
+  price: number;
+}
 
 export interface flavor {
-  name: string,
-  color: string,
-};
+  name: string;
+  color: string;
+}
 
 export const boxSizes: boxSize[] = [{
     name: "Mini",
@@ -42,69 +43,74 @@ export const boxSizes: boxSize[] = [{
 ];
 
 export const cakeFlavors: flavor[] = [{
-    name: "chocolate",
-    color: "#333"
+    color: "#333",
+    name: "carrot"
   }, {
-    name: "vanilla",
-    color: "#333"
+    color: "#333",
+    name: "chocolate"
   }, {
-    name: "mocha",
-    color: "#333"
+    color: "#333",
+    name: "coconut"
   }, {
-    name: "coffee",
-    color: "#333"
+    color: "#333",
+    name: "coffee"
   }, {
-    name: "spice",
-    color: "#333"
+    color: "#333",
+    name: "lemon"
   }, {
-    name: "carrot",
-    color: "#333"
+    color: "#333",
+    name: "mocha"
   }, {
-    name: "red velvet",
-    color: "#333"
+    color: "#333",
+    name: "red velvet"
   }, {
-    name: "coconut",
-    color: "#333"
+    color: "#333",
+    name: "spice"
   }, {
-    name: "lemon",
-    color: "#333"
+    color: "#333",
+    name: "vanilla"
   }
 ];
 
 export const frostingFlavors: flavor[] = [{
-    name: "cream cheese",
-    color: "#333"
+    color: "#000",
+    name: "- none -"
+  },{
+    color: "#333",
+    name: "chocolate buttercream"
   }, {
-    name: "vanilla buttercream",
-    color: "#333"
+    color: "#333",
+    name: "coconut"
   }, {
-    name: "chocolate buttercream",
-    color: "#333"
+    color: "#333",
+    name: "cookies and cream"
   }, {
-    name: "cookies and cream",
-    color: "#333"
+    color: "#333",
+    name: "cream cheese"
   }, {
-    name: "mint chocolate cookie",
-    color: "#333"
+    color: "#333",
+    name: "hazelnut"
   }, {
-    name: "peanut butter",
-    color: "#333"
+    color: "#333",
+    name: "lemon"
   }, {
-    name: "hazelnut",
-    color: "#333"
+    color: "#333",
+    name: "mint chocolate cookie"
   }, {
-    name: "coconut",
-    color: "#333"
+    color: "#333",
+    name: "peanut butter"
   }, {
-    name: "lemon",
-    color: "#333"
+    color: "#333",
+    name: "raspberry"
   }, {
-    name: "raspberry",
-    color: "#333"
+    color: "#333",
+    name: "strawberry"
   }, {
-    name: "strawberry",
-    color: "#333"
+    color: "#333",
+    name: "vanilla buttercream"
   }
 ];
 
-export const defaultCakeFlavor = cakeFlavors[1];
+export const defaultCakeFlavor = cakeFlavors[cakeFlavors.length-1];
+export const defaultFrostingFlavor = frostingFlavors[frostingFlavors.length-1];
+export const defaultNullFrostingFlavor = frostingFlavors[0];
