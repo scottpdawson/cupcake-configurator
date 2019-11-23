@@ -1,16 +1,26 @@
+import { addDays } from 'date-fns';
+
 export interface order {
   orderTotal: number;
   orderDetails: orderItem[];
+  fromName: string;
+  fromEmail: string;
+  fromPhone: string;
+  orderDate: Date;
 }
 
 export const initialState = {
   orderTotal: 0,
-  orderDetails: []
+  orderDetails: [],
+  fromName: '',
+  fromEmail: '',
+  fromPhone: '',
+  orderDate: addDays(new Date(), 2),
 };
 
 export interface orderItem {
   key: string;
-  name: string;
+  size: boxSize;
   cakeFlavor: flavor;
   frostingFlavor: flavor[]; 
   price: number;

@@ -5,11 +5,14 @@
   "dependencies": {
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.8",
+    "@types/react-datepicker": "^2.9.5",
     "@types/react-dom": "^16.9.4",
     "bootstrap": "^4.3.1",
-    "jquery": "^3.3.1",
+    "emailjs-com": "^2.4.1",
+    "jquery": "^3.4.1",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
+    "react-datepicker": "^2.10.1",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
     "typescript": "^3.7.2"

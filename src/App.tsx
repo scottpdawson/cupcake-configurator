@@ -1,4 +1,8 @@
 import * as React from "react";
+import emailjs from "emailjs-com";
+import DatePicker from "react-datepicker";
+import { format, addDays } from "date-fns";
+import { config } from "./Config"
 import {
   initialState,
   order,
@@ -13,6 +17,7 @@ import {
   defaultNullFrostingFlavor,
 } from "./Constants";
 import { generateUniqueKey } from "./Helpers";
+import "react-datepicker/dist/react-datepicker.css";
 
 class App extends React.Component<any, order> {
   constructor(props: any) {
@@ -23,6 +28,60 @@ class App extends React.Component<any, order> {
   onStartOver = () => {
     this.setState({ ...initialState });
   };
+
+  updateOrderContactDetails = (event: { target: { name: any; value: any; } }) => {
+    // generically updates state key based on form element name
+    const newState = { 
+      [event.target.name]: event.target.value 
+    } as Pick<order, keyof order>;
+    this.setState(newState);
+  }
+
+  canSubmitOrder = () => {
+    // validate whether we can submit the form or not
+    // 1. ensure user filled out all contact info
+    // 2. ensure order has at least one item
+    return (
+      !this.state.fromName || 
+      !this.state.fromEmail || // todo: check validity of email address 
+      !this.state.fromPhone || 
+      !this.state.orderDate || 
+      this.state.orderTotal === 0
+    );
+  }
+
+  summarizeOrder = () => {
+    let summary = '';
+    this.state.orderDetails.forEach(i => {
+      summary = summary.concat(i.size.count + ' ' + i.size.name + ' ' + i.cakeFlavor.name + ' cupcakes ($' + i.size.price + ')<br />');
+      i.frostingFlavor.forEach(f => {
+        summary = summary.concat((f.name != '- none -') ? '-- ' + f.name + '<br />' : '');
+      });
+      summary = summary.concat('<br />');
+    });
+    return summary;
+  }
+
+  onSubmitOrderRequest = () => {
+    var templateParams = {
+      from_name: this.state.fromName,
+      from_email: this.state.fromEmail,
+      from_phone: this.state.fromPhone,
+      order_date: format(this.state.orderDate, 'MMMM d YYYY', {
+        useAdditionalWeekYearTokens: true,
+        useAdditionalDayOfYearTokens: true,
+      }),
+      total: this.state.orderTotal,
+      quote_details: this.summarizeOrder()
+    };
+   
+    emailjs.send(config.emailjs.serviceID, config.emailjs.templateID, templateParams, config.emailjs.userID)
+      .then(function(response) {
+         console.log('SUCCESS!', response.status, response.text);
+      }, function(error) {
+         console.log('FAILED...', error);
+      });
+  }
 
   getCurrentOrder() {
     return JSON.parse(JSON.stringify(this.state.orderDetails));
@@ -43,7 +102,7 @@ class App extends React.Component<any, order> {
     let currentOrder = this.getCurrentOrder();
     currentOrder.push({
       key: generateUniqueKey("CC"), // key is unique
-      name: newItem.name,
+      size: newItem,
       cakeFlavor: defaultCakeFlavor,
       frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
       price: newItem.price
@@ -96,11 +155,29 @@ class App extends React.Component<any, order> {
     return totalPrice;
   }
 
+  updateOrderDate = (date: Date | null) => {
+    if (date) {
+      this.setState({
+        orderDate: date
+      });
+    }
+  };
+
   render() {
     return (
       <div>
         <h1>Cupcake Configurator</h1>
-        <p>lorem ipsum instructions</p>
+
+        <b>When would you like your order?</b><br />
+        You may submit a quote request for delivery 48 hours in advance or more. Before requesting a quote, please check my <a href="https://emoticakes.com/" target='_blank'>availability calendar</a>.<br />
+        
+        <DatePicker
+          selected={this.state.orderDate}
+          minDate={addDays(new Date(), 2)}
+          onChange={date => this.updateOrderDate(date)}
+          monthsShown={2}
+        />
+
         <h4>Add to Order</h4>
         <ul>
           {Object.keys(boxSizes).map((item, i) => (
@@ -132,7 +209,7 @@ class App extends React.Component<any, order> {
                     remove
                   </button>
                 </td>
-                <td>{item.name}</td>
+                <td>{item.size.name}</td>
                 <td>
                   <select
                     value={item.cakeFlavor && item.cakeFlavor.name}
@@ -178,6 +255,26 @@ class App extends React.Component<any, order> {
             ))}
           </tbody>
         </table>
+        <hr />
+        <h2>Ready to Request a Quote?</h2>
+        <form>
+          <label>
+            Name:
+            <input type="text" name="fromName" value={this.state.fromName} onChange={this.updateOrderContactDetails} />
+          </label>
+          <label>
+            Email:
+            <input type="email" name="fromEmail" value={this.state.fromEmail} onChange={this.updateOrderContactDetails} />
+          </label>
+          <label>
+            Phone:
+            <input type="phone" name="fromPhone" value={this.state.fromPhone} onChange={this.updateOrderContactDetails} />
+          </label>
+        </form>
+        <button type="button" disabled={this.canSubmitOrder()} onClick={this.onSubmitOrderRequest}>
+          Submit Quote Request
+        </button>
+        <hr />
         <button type="button" onClick={this.onStartOver}>
           Start Over
         </button>
@@ -190,8 +287,7 @@ class App extends React.Component<any, order> {
 //
 // 1. provide a message on cupcakes (custom disc color, letter color)
 // 2. delivery (extra charge) or pick-up
-// 3. send email on order quote submission, cc: to submitter
-// https://sheelahb.com/blog/how-to-send-email-from-react-without-a-backend/
-//
+// 3. variable pricing based on flavor
+// 
 
 export default App;
