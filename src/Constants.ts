@@ -9,7 +9,7 @@ export interface order {
   orderDate: Date;
 }
 
-export const initialState = {
+export const defaultState = {
   orderTotal: 0,
   orderDetails: [],
   fromName: '',
