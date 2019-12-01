@@ -9,6 +9,7 @@ import {
   boxSizes,
   cakeFlavors,
   flavor,
+  deliveryOption,
   frostingFlavors,
   defaultCakeFlavor,
   defaultFrostingFlavor,
@@ -27,7 +28,7 @@ export const summarizeOrder = (state: order) => {
         " " +
         i.cakeFlavor.name +
         " cupcakes ($" +
-        i.size.price +
+        i.totalPrice.toFixed(2) +
         ")<br />"
     );
     i.frostingFlavor.forEach((f: flavor) => {
@@ -62,7 +63,8 @@ export const canSubmitOrder = (state: order) => {
         useAdditionalWeekYearTokens: true,
         useAdditionalDayOfYearTokens: true
       }),
-      total: state.orderTotal,
+      delivery: state.deliveryOption.name + " ($" + state.deliveryOption.price + ")",
+      total: state.orderTotal.toFixed(2),
       quote_details: summarizeOrder(state)
     };
 
@@ -88,7 +90,7 @@ export const canSubmitOrder = (state: order) => {
       accumulator: number,
       order: orderItem
     ) {
-      return accumulator + order.price;
+      return accumulator + order.totalPrice;
     },
     0);
     return totalPrice;
@@ -96,6 +98,10 @@ export const canSubmitOrder = (state: order) => {
 
   export const getFlavorFromString = (flavor: string, flavors: flavor[]) => {
     return flavors.find(obj => obj.name == flavor);
+  };
+
+  export const getDeliveryOptionFromKey = (key: number, deliveryOptions: deliveryOption[]) => {
+    return deliveryOptions.find(obj => obj.key == key);
   };
 
   export const getCurrentOrder = (state: order) => {

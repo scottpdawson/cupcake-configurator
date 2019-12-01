@@ -7,7 +7,10 @@ import {
   orderItem,
   boxSize,
   boxSizes,
+  flavor,
   cakeFlavors,
+  deliveryOption,
+  deliveryOptions,
   frostingFlavors,
   defaultCakeFlavor,
   defaultFrostingFlavor,
@@ -20,6 +23,7 @@ import {
   getFlavorFromString,
   getCurrentOrder,
   getOrderItemFromKey,
+  getDeliveryOptionFromKey,
 } from "./OrderUtils";
 import { generateUniqueKey } from "./Helpers";
 import "react-datepicker/dist/react-datepicker.css";
@@ -47,8 +51,25 @@ function App() {
   };
 
   const updateOrderDetails = (orderDetails: orderItem[]) => {
+    // calculate price for each orderItem in orderDetails
+    orderDetails.forEach((i: orderItem) => {
+      let basePrice = i.basePrice;
+      let quantity = i.size.count;
+      let cakeUpcharge = quantity * i.cakeFlavor.upCharge * i.size.flavorMultiplier;
+      let numberOfFlavors = 0;
+      let frostingUpcharge = 0;
+      i.frostingFlavor.forEach((f: flavor) => {
+        numberOfFlavors += (f.name != "- none -") ? 1 : 0;
+        frostingUpcharge += (f.name != "- none -") ? f.upCharge : 0;
+      });
+      i.totalPrice = 
+        basePrice + 
+        cakeUpcharge + 
+        (((frostingUpcharge * quantity) / numberOfFlavors) * i.size.flavorMultiplier);
+    });
+
     setState({
-      orderTotal: calculateTotal(orderDetails),
+      orderTotal: calculateTotal(orderDetails) + state.deliveryOption.price,
       orderDetails: orderDetails
     });
   };
@@ -60,7 +81,8 @@ function App() {
       size: newItem,
       cakeFlavor: defaultCakeFlavor,
       frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
-      price: newItem.price
+      flavorMultiplier: newItem.flavorMultiplier,
+      basePrice: newItem.price * newItem.count,
     });
     updateOrderDetails(currentOrder);
   };
@@ -107,28 +129,47 @@ function App() {
     }
   };
 
+  const updateDeliveryOption = (
+    e: any,
+  ) => {
+    let newDeliveryOption = getDeliveryOptionFromKey(e.target.value, deliveryOptions);
+    if (newDeliveryOption) {
+      setState({
+        orderTotal: calculateTotal(state.orderDetails) + newDeliveryOption.price,
+        deliveryOption: newDeliveryOption,
+      });
+    }
+  };
+
   return (
     <div>
       <h1>Cupcake Configurator</h1>
-      <b>When would you like your order?</b>
-      <br />
-      You may submit a quote request for delivery 48 hours in advance or more.
-      Before requesting a quote, please check my{" "}
-      <a href="https://emoticakes.com/" target="_blank">
-        availability calendar
-      </a>
-      .<br />
+      <h4>When would you like your order?</h4>
+      <p>You may submit a quote request for delivery 48 hours in advance or more.</p>
+      <p>Before requesting a quote, please check my <a href="https://emoticakes.com/" target="_blank">availability calendar</a>.</p>
       <DatePicker
         selected={state.orderDate}
         minDate={addDays(new Date(), 2)}
         onChange={date => updateOrderDate(date)}
         monthsShown={2}
       />
+      <h4>Delivery Option</h4>
+      <select
+        value={state.deliveryOption.key}
+        onChange={e => updateDeliveryOption(e)}
+      >
+        {Object.keys(deliveryOptions).map((deliveryOption, i) => (
+          <option key={deliveryOptions[i].key} value={deliveryOptions[i].key}>
+            {deliveryOptions[i].name}
+            {deliveryOptions[i].price ? "(+$" + deliveryOptions[i].price + ")" : ""}
+          </option>
+        ))}
+      </select>
       <h4>Add to Order</h4>
       <ul>
         {Object.keys(boxSizes).map((item, i) => (
           <li onClick={e => addToOrder(boxSizes[i])} key={i}>
-            {boxSizes[i].name} ({boxSizes[i].count})
+            {boxSizes[i].name} ({boxSizes[i].count}) <i>per cupcake: ${boxSizes[i].price}</i>
           </li>
         ))}
       </ul>
@@ -139,9 +180,12 @@ function App() {
           <tr>
             <th></th>
             <th>Item</th>
+            <th># of Cupcakes</th>
+            <th>Base Price</th>
             <th>Cake</th>
             <th>Frosting</th>
             <th>2nd Frosting (optional)</th>
+            <th>Item Total</th>
           </tr>
         </thead>
         <tbody>
@@ -153,6 +197,8 @@ function App() {
                 </button>
               </td>
               <td>{item.size.name}</td>
+              <td>{item.size.count}</td>
+              <td>${(item.size.price * item.size.count).toFixed(2)}</td>
               <td>
                 <select
                   value={item.cakeFlavor && item.cakeFlavor.name}
@@ -161,6 +207,7 @@ function App() {
                   {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                     <option key={i} value={cakeFlavors[i].name}>
                       {cakeFlavors[i].name}
+                      {cakeFlavors[i].upCharge ? "(+" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
                     </option>
                   ))}
                 </select>
@@ -173,6 +220,7 @@ function App() {
                   {Object.keys(frostingFlavors).map((thisFlavor, i) => (
                     <option key={i} value={frostingFlavors[i].name}>
                       {frostingFlavors[i].name}
+                      {frostingFlavors[i].upCharge ? "(+" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
                     </option>
                   ))}
                 </select>
@@ -183,15 +231,14 @@ function App() {
                   onChange={e => updateFrostingFlavor(e, item.key, 1)}
                 >
                   {Object.keys(frostingFlavors).map((thisFlavor, i) => (
-                    <option
-                      key={i}
-                      value={frostingFlavors[i] && frostingFlavors[i].name}
-                    >
+                    <option key={i} value={frostingFlavors[i].name}>
                       {frostingFlavors[i].name}
+                      {frostingFlavors[i].upCharge ? "(+" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
                     </option>
                   ))}
                 </select>
               </td>
+              <td>${item.totalPrice.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
@@ -244,9 +291,7 @@ function App() {
 
 // todo:
 //
-// 1. provide a message on cupcakes (custom disc color, letter color)
-// 2. delivery (extra charge) or pick-up
-// 3. variable pricing based on flavor
+// provide a message on cupcakes (custom disc color, letter color)
 //
 
 export default App;

@@ -3,124 +3,186 @@ import { addDays } from 'date-fns';
 export interface order {
   orderTotal: number;
   orderDetails: orderItem[];
+  deliveryOption: deliveryOption;
   fromName: string;
   fromEmail: string;
   fromPhone: string;
   orderDate: Date;
 }
 
-export const defaultState = {
-  orderTotal: 0,
-  orderDetails: [],
-  fromName: '',
-  fromEmail: '',
-  fromPhone: '',
-  orderDate: addDays(new Date(), 2),
-};
-
 export interface orderItem {
   key: string;
   size: boxSize;
   cakeFlavor: flavor;
-  frostingFlavor: flavor[]; 
-  price: number;
+  frostingFlavor: flavor[];
+  basePrice: number;
+  totalPrice: number;
 }
 
 export interface boxSize {
   name: string;
   count: number;
+  flavorMultiplier: number; // used for flavor price variance for minis
   price: number;
 }
 
 export interface flavor {
   name: string;
   color: string;
+  upCharge: number;
 }
+
+export interface deliveryOption {
+  key: number;
+  name: string;
+  price: number;
+}
+
+export const deliveryOptions: deliveryOption[] = [{
+    key: 1,
+    name: "Pick up in Trumansburg, NY (free)",
+    price: 0,
+  }, {
+    key: 2,
+    name: "Deliver to Trumansburg",
+    price: 5,
+  }, {
+    key: 3,
+    name: "Deliver to Ithaca area",
+    price: 5,
+  }
+];
 
 export const boxSizes: boxSize[] = [{
     name: "Mini",
     count: 24,
-    price: 12
+    flavorMultiplier: 1/3, // mini flavor increments are 3:1
+    price: .85,
   }, {
     name: "Regular",
     count: 12,
-    price: 34
+    flavorMultiplier: 1,
+    price: 1.75
   }, {
     name: "Regular 4-pack",
     count: 12,
-    price: 12
+    flavorMultiplier: 1,
+    price: 1.75
   }
 ];
 
 export const cakeFlavors: flavor[] = [{
     color: "#333",
-    name: "carrot"
+    name: "carrot",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "chocolate"
+    name: "chocolate",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "coconut"
+    name: "coconut",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "coffee"
+    name: "coffee",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "lemon"
+    name: "hazelnut",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "mocha"
+    name: "lemon",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "red velvet"
+    name: "mocha",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "spice"
+    name: "pistachio",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "vanilla"
+    name: "red velvet",
+    upCharge: 0,
+  }, {
+    color: "#333",
+    name: "spice",
+    upCharge: 0,
+  }, {
+    color: "#333",
+    name: "vanilla",
+    upCharge: 0,
   }
 ];
 
 export const frostingFlavors: flavor[] = [{
     color: "#000",
-    name: "- none -"
+    name: "- none -",
+    upCharge: 0,
   },{
     color: "#333",
-    name: "chocolate buttercream"
+    name: "chocolate buttercream",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "coconut"
+    name: "coconut",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "cookies and cream"
+    name: "cookies and cream",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "cream cheese"
+    name: "cream cheese",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "hazelnut"
+    name: "hazelnut",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "lemon"
+    name: "lemon",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "mint chocolate cookie"
+    name: "mint chocolate cookie",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "peanut butter"
+    name: "peanut butter",
+    upCharge: 0,
   }, {
     color: "#333",
-    name: "raspberry"
+    name: "pistachio",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "strawberry"
+    name: "raspberry",
+    upCharge: .25,
   }, {
     color: "#333",
-    name: "vanilla buttercream"
+    name: "strawberry",
+    upCharge: .25,
+  }, {
+    color: "#333",
+    name: "vanilla buttercream",
+    upCharge: 0,
   }
 ];
 
 export const defaultCakeFlavor = cakeFlavors[cakeFlavors.length-1];
 export const defaultFrostingFlavor = frostingFlavors[frostingFlavors.length-1];
 export const defaultNullFrostingFlavor = frostingFlavors[0];
+
+export const defaultState = {
+  orderTotal: 0,
+  orderDetails: [],
+  deliveryOption: deliveryOptions[0],
+  fromName: '',
+  fromEmail: '',
+  fromPhone: '',
+  orderDate: addDays(new Date(), 2),
+};
