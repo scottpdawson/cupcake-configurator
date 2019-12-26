@@ -18,15 +18,24 @@ import {
 } from "./Constants";
 import {
   canSubmitOrder,
-  onSubmitOrderRequest,
   calculateTotal,
+  getBoxSizeFromString,
   getFlavorFromString,
   getCurrentOrder,
   getOrderItemFromKey,
   getDeliveryOptionFromKey,
+  summarizeOrder,
 } from "./OrderUtils";
-import { generateUniqueKey } from "./Helpers";
+import { generateUniqueKey, getChevron } from "./Helpers";
 import "react-datepicker/dist/react-datepicker.css";
+import { FaPlusCircle, FaEllipsisH, FaTrashAlt, FaRedoAlt, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import moment from 'moment';
+// @ts-ignore
+import Expand from 'react-expand-animated';
+import RadioButton from "./RadioButton/RadioButton";
+import emailjs from "emailjs-com";
+import { format } from "date-fns";
+import { config } from "./Config";
 
 function App() {
 
@@ -76,8 +85,9 @@ function App() {
 
   const addToOrder = (newItem: boxSize) => {
     let currentOrder = getCurrentOrder(state);
+    let newItemKey = generateUniqueKey("CC"); // key is unique
     currentOrder.push({
-      key: generateUniqueKey("CC"), // key is unique
+      key: newItemKey,
       size: newItem,
       cakeFlavor: defaultCakeFlavor,
       frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
@@ -85,6 +95,7 @@ function App() {
       basePrice: newItem.price * newItem.count,
     });
     updateOrderDetails(currentOrder);
+    setIsEditingItemKey(newItemKey); // set new item to is editing
   };
 
   const removeFromOrder = (keyToRemove: string) => {
@@ -95,6 +106,17 @@ function App() {
       return item.key !== keyToRemove;
     });
     updateOrderDetails(currentOrderItemRemoved);
+  };
+
+  const updateBoxSize = (e: any, orderItemToUpdate: string) => {
+    let currentOrder = getCurrentOrder(state);
+    let thisOrderItem = getOrderItemFromKey(currentOrder, orderItemToUpdate);
+    let boxSize = getBoxSizeFromString(e.target.value, boxSizes);
+    if (thisOrderItem && boxSize) {
+      thisOrderItem.size = boxSize;
+      thisOrderItem.basePrice = boxSize.price * boxSize.count,
+      updateOrderDetails(currentOrder);
+    }
   };
 
   const updateCakeFlavor = (e: any, orderItemToUpdate: string) => {
@@ -129,6 +151,18 @@ function App() {
     }
   };
 
+  const toggleIsEditingSection = (thisSection: string) => {
+    setState({
+      isEditingSection: thisSection,
+    });
+  }
+
+  const setIsEditingItemKey = (thisItemKey: string) => {
+    setState({
+      isEditingItemKey: thisItemKey,
+    });
+  }
+
   const updateDeliveryOption = (
     e: any,
   ) => {
@@ -141,157 +175,262 @@ function App() {
     }
   };
 
+  const headerForSection = (className: string, title: string, subTitle: string) => {
+    let sectionIsExpanded = state.isEditingSection === className;
+    return  <h4 className={className} 
+              onClick={(e) => toggleIsEditingSection(className)}>
+              {getChevron(sectionIsExpanded)}
+              <span>{title}</span>
+              {!sectionIsExpanded && <span className="subTitle">{subTitle}</span>}
+            </h4>
+  }
+
+  const orderDateSection = () => {
+    return <div>
+      {headerForSection('orderDate', 'When would you like your order?', moment(state.orderDate).format('LL'))}
+      <Expand duration={animDuration} open={state.isEditingSection === 'orderDate'}>
+        <div className="padded">
+          <p>You may submit a quote request for delivery 48 hours in advance or more. Before requesting a quote, please check my <a href="https://emoticakes.com/" target="_blank">availability calendar</a>.</p>
+          <DatePicker
+            selected={state.orderDate}
+            minDate={addDays(new Date(), 2)}
+            onChange={date => updateOrderDate(date)}
+            monthsShown={1}
+          />
+        </div>
+      </Expand>
+    </div>;
+  }
+
+  const orderDetailsSection = () => {
+    return <div>
+      {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
+      <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
+        <div className="padded orderCarousel">
+          {state.orderDetails.map((item: orderItem) => (
+            <div key={item.key} className="orderItem orderCard">
+              {!(state.isEditingItemKey === item.key) && <div>
+                <div className="edit" title="Edit" onClick={(e) => { setIsEditingItemKey(item.key) }}><FaEllipsisH /></div>
+                <span className="orderQuantity">{item.size.count}</span> 
+                <span className="orderBoxSize">{item.size.name}</span>
+                <span className="orderDetails">
+                  {item.cakeFlavor.name} cupcakes w/<br />
+                  {item.frostingFlavor && item.frostingFlavor[0].name}<br />
+                  {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
+                  frosting
+                </span> 
+                <span className="orderCost">${item.totalPrice.toFixed(2)}</span>
+              </div>}
+              {(state.isEditingItemKey === item.key) && <div className="editOrderItemBlock">
+                <div className="trash" title="Delete" onClick={e => removeFromOrder(item.key)}><FaTrashAlt /></div>
+                <span className="orderEditSectionTitle">Cupcake Size</span>
+                <select
+                      value={item.size && item.size.name}
+                      onChange={e => updateBoxSize(e, item.key)}
+                    >
+                      {Object.keys(boxSizes).map((thisBoxSize, i) => (
+                        <option key={i} value={boxSizes[i].name}>
+                          {boxSizes[i].count} {boxSizes[i].name} (${boxSizes[i].price} ea)
+                        </option>
+                      ))}
+                    </select>
+                <span className="orderEditSectionTitle">Cake</span>
+                <select
+                    value={item.cakeFlavor && item.cakeFlavor.name}
+                    onChange={e => updateCakeFlavor(e, item.key)}
+                  >
+                    {Object.keys(cakeFlavors).map((thisFlavor, i) => (
+                      <option key={i} value={cakeFlavors[i].name}>
+                        {cakeFlavors[i].name}
+                        {cakeFlavors[i].upCharge ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="orderEditSectionTitle">Frosting</span>
+                  <select
+                      value={item.frostingFlavor && item.frostingFlavor[0].name}
+                      onChange={e => updateFrostingFlavor(e, item.key, 0)}
+                    >
+                      {Object.keys(frostingFlavors).map((thisFlavor, i) => (
+                        <option key={i} value={frostingFlavors[i].name}>
+                          {frostingFlavors[i].name}
+                          {frostingFlavors[i].upCharge ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="orderEditSectionTitle">2nd Frosting (optional)</span>
+                    <select
+                      value={item.frostingFlavor[1] && item.frostingFlavor[1].name}
+                      onChange={e => updateFrostingFlavor(e, item.key, 1)}
+                    >
+                      {Object.keys(frostingFlavors).map((thisFlavor, i) => (
+                        <option key={i} value={frostingFlavors[i].name}>
+                          {frostingFlavors[i].name}
+                          {frostingFlavors[i].upCharge ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                <span className="done" onClick={(e) => { setIsEditingItemKey('') }}>Done</span>
+              </div>}
+            </div>
+          ))}
+          <div className="addItemToOrder orderCard" title="Add to Order" onClick={e => addToOrder(boxSizes[1])}>
+            <FaPlusCircle size="50" />
+          </div>
+        </div>        
+      </Expand>
+    </div>;
+  }
+
+  const deliveryOptionsSection = () => {
+    return <div>
+      {headerForSection('deliveryOption', 'Delivery Option', state.deliveryOption.name)}
+      <Expand duration={animDuration} open={state.isEditingSection === 'deliveryOption'}>
+        <div className="padded">
+          {Object.keys(deliveryOptions).map((deliveryOption, i) => (
+            <RadioButton 
+              changed={updateDeliveryOption} 
+              id={i} 
+              key={i}
+              isSelected={state.deliveryOption.key === deliveryOptions[i].key} 
+              label={deliveryOptions[i].price ? deliveryOptions[i].name + " (+$" + deliveryOptions[i].price + ")" : deliveryOptions[i].name}
+              value={deliveryOptions[i].key}
+            />  
+          ))}
+        </div>
+      </Expand>
+    </div>;
+  }
+
+  const emailOrderRequest = (state: order) => {
+    var templateParams = {
+      from_name: state.fromName,
+      from_email: state.fromEmail,
+      from_phone: state.fromPhone,
+      special_requests: state.specialRequests,
+      order_date: format(state.orderDate, "MMMM d YYYY", {
+        useAdditionalWeekYearTokens: true,
+        useAdditionalDayOfYearTokens: true
+      }),
+      delivery: state.deliveryOption.name + " ($" + state.deliveryOption.price + ")",
+      total: state.orderTotal.toFixed(2),
+      quote_details: summarizeOrder(state)
+    };
+
+    emailjs
+      .send(
+        config.emailjs.serviceID,
+        config.emailjs.templateID,
+        templateParams,
+        config.emailjs.userID
+      )
+      .then(
+        function(response) {
+          setState({
+            emailSubmitted: true,
+          });
+        },
+        function(error) {
+          setState({
+            emailSubmitted: true,
+            emailError: error,
+          });
+        }
+      );
+  };
+
+  const requestQuoteSection = () => {
+    return <div>
+      {headerForSection('requestQuote', 'Request a Quote', '')}
+      <Expand duration={animDuration} open={state.isEditingSection === 'requestQuote'}>
+        <div className="padded">
+          <form className="quote-form">
+            <ul>
+              <label>
+                <span>Name</span>
+                <input
+                  type="text"
+                  name="fromName"
+                  value={state.fromName}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Email</span>
+                <input
+                  type="email"
+                  name="fromEmail"
+                  value={state.fromEmail}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input
+                  type="phone"
+                  name="fromPhone"
+                  value={state.fromPhone}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Special Requests (message, design?)</span>
+                <input
+                  type="text"
+                  name="specialRequests"
+                  value={state.specialRequests}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+            </ul>
+            <button
+              type="button"
+              disabled={canSubmitOrder(state)}
+              onClick={(e) => emailOrderRequest(state)}
+            >
+              Submit Quote Request
+            </button>
+          </form>
+        </div>
+      </Expand>
+    </div>;
+  }
+
+  const animDuration = 300;
+
   return (
     <div>
-      <h1>Cupcake Configurator</h1>
-      <h4>When would you like your order?</h4>
-      <p>You may submit a quote request for delivery 48 hours in advance or more.</p>
-      <p>Before requesting a quote, please check my <a href="https://emoticakes.com/" target="_blank">availability calendar</a>.</p>
-      <DatePicker
-        selected={state.orderDate}
-        minDate={addDays(new Date(), 2)}
-        onChange={date => updateOrderDate(date)}
-        monthsShown={2}
-      />
-      <h4>Delivery Option</h4>
-      <select
-        value={state.deliveryOption.key}
-        onChange={e => updateDeliveryOption(e)}
-      >
-        {Object.keys(deliveryOptions).map((deliveryOption, i) => (
-          <option key={deliveryOptions[i].key} value={deliveryOptions[i].key}>
-            {deliveryOptions[i].name}
-            {deliveryOptions[i].price ? "(+$" + deliveryOptions[i].price + ")" : ""}
-          </option>
-        ))}
-      </select>
-      <h4>Add to Order</h4>
-      <ul>
-        {Object.keys(boxSizes).map((item, i) => (
-          <li onClick={e => addToOrder(boxSizes[i])} key={i}>
-            {boxSizes[i].name} ({boxSizes[i].count}) <i>per cupcake: ${boxSizes[i].price}</i>
-          </li>
-        ))}
-      </ul>
-      <h4>Your Order</h4>
-      <h5>Order Total: ${state.orderTotal}</h5>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Item</th>
-            <th># of Cupcakes</th>
-            <th>Base Price</th>
-            <th>Cake</th>
-            <th>Frosting</th>
-            <th>2nd Frosting (optional)</th>
-            <th>Item Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {state.orderDetails.map((item: orderItem) => (
-            <tr key={item.key}>
-              <td>
-                <button type="button" onClick={e => removeFromOrder(item.key)}>
-                  remove
-                </button>
-              </td>
-              <td>{item.size.name}</td>
-              <td>{item.size.count}</td>
-              <td>${(item.size.price * item.size.count).toFixed(2)}</td>
-              <td>
-                <select
-                  value={item.cakeFlavor && item.cakeFlavor.name}
-                  onChange={e => updateCakeFlavor(e, item.key)}
-                >
-                  {Object.keys(cakeFlavors).map((thisFlavor, i) => (
-                    <option key={i} value={cakeFlavors[i].name}>
-                      {cakeFlavors[i].name}
-                      {cakeFlavors[i].upCharge ? "(+" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <select
-                  value={item.frostingFlavor && item.frostingFlavor[0].name}
-                  onChange={e => updateFrostingFlavor(e, item.key, 0)}
-                >
-                  {Object.keys(frostingFlavors).map((thisFlavor, i) => (
-                    <option key={i} value={frostingFlavors[i].name}>
-                      {frostingFlavors[i].name}
-                      {frostingFlavors[i].upCharge ? "(+" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <select
-                  value={item.frostingFlavor[1] && item.frostingFlavor[1].name}
-                  onChange={e => updateFrostingFlavor(e, item.key, 1)}
-                >
-                  {Object.keys(frostingFlavors).map((thisFlavor, i) => (
-                    <option key={i} value={frostingFlavors[i].name}>
-                      {frostingFlavors[i].name}
-                      {frostingFlavors[i].upCharge ? "(+" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " per)" : ""}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>${item.totalPrice.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <hr />
-      <h2>Ready to Request a Quote?</h2>
-      <form>
-        <label>
-          Name:
-          <input
-            type="text"
-            name="fromName"
-            value={state.fromName}
-            onChange={updateOrderContactDetails}
-          />
-        </label>
-        <label>
-          Email:
-          <input
-            type="email"
-            name="fromEmail"
-            value={state.fromEmail}
-            onChange={updateOrderContactDetails}
-          />
-        </label>
-        <label>
-          Phone:
-          <input
-            type="phone"
-            name="fromPhone"
-            value={state.fromPhone}
-            onChange={updateOrderContactDetails}
-          />
-        </label>
-      </form>
-      <button
-        type="button"
-        disabled={canSubmitOrder(state)}
-        onClick={(e) => onSubmitOrderRequest(state)}
-      >
-        Submit Quote Request
-      </button>
-      <hr />
-      <button type="button" onClick={onStartOver}>
-        Start Over
-      </button>
+      <div className="header">
+        <span className="hed">
+          emoticakes
+          <span className="startOver" onClick={onStartOver} title="Start Over">
+            <FaRedoAlt className="startOverIcon" />
+          </span>
+        </span>
+        <h1>Cupcake Quote</h1>
+      </div>
+      {!state.emailSubmitted && <div>
+        {orderDateSection()}
+        {orderDetailsSection()}
+        {deliveryOptionsSection()}
+        {requestQuoteSection()}
+      </div>}
+      {(state.emailSubmitted && state.emailError === '') && <div className="emailResult">
+        <FaCheckCircle className="emailStatusIcon" />
+        <h3>Thank you.</h3>
+        <p>I received your email request for a quote confirmation.</p>
+        <p>Your order is not yet confirmed, so please give me 24 hours to get back to you with a confirmation. Thank you!</p>
+
+        <p>You may also start over and <a href="javascript:void(0)" onClick={onStartOver} style={{ color: '#3399CC' }}>request a new quote</a>, too.</p>
+      </div>}
+      {(state.emailSubmitted && state.emailError != '') && <div className="emailResult">
+      <FaExclamationTriangle className="emailStatusIcon" />
+        <h3>Oops.</h3>
+        <p>There was a problem sending your email request for a quote confirmation.</p>
+        <p>You can try to <a href="javascript:void(0)" onClick={onStartOver} style={{ color: '#3399CC' }}>start over</a>, or just give me a call at (607) 387-7031.</p>
+      </div>}
     </div>
   );
 }
-
-// todo:
-//
-// provide a message on cupcakes (custom disc color, letter color)
-//
 
 export default App;

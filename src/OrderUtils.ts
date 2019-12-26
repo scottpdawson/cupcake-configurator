@@ -1,6 +1,4 @@
 import React, { useReducer } from "react";
-import emailjs from "emailjs-com";
-import { format } from "date-fns";
 import {
   defaultState,
   order,
@@ -16,7 +14,6 @@ import {
   defaultNullFrostingFlavor
 } from "./Constants";
 import { generateUniqueKey } from "./Helpers";
-import { config } from "./Config";
 
 export const summarizeOrder = (state: order) => {
   let summary = "";
@@ -54,37 +51,6 @@ export const canSubmitOrder = (state: order) => {
     );
   };
 
-  export const onSubmitOrderRequest = (state: order) => {
-    var templateParams = {
-      from_name: state.fromName,
-      from_email: state.fromEmail,
-      from_phone: state.fromPhone,
-      order_date: format(state.orderDate, "MMMM d YYYY", {
-        useAdditionalWeekYearTokens: true,
-        useAdditionalDayOfYearTokens: true
-      }),
-      delivery: state.deliveryOption.name + " ($" + state.deliveryOption.price + ")",
-      total: state.orderTotal.toFixed(2),
-      quote_details: summarizeOrder(state)
-    };
-
-    emailjs
-      .send(
-        config.emailjs.serviceID,
-        config.emailjs.templateID,
-        templateParams,
-        config.emailjs.userID
-      )
-      .then(
-        function(response) {
-          console.log("SUCCESS!", response.status, response.text);
-        },
-        function(error) {
-          console.log("FAILED...", error);
-        }
-      );
-  };
-
   export const calculateTotal = (orderDetails: orderItem[]) => {
     var totalPrice = orderDetails.reduce(function(
       accumulator: number,
@@ -94,6 +60,10 @@ export const canSubmitOrder = (state: order) => {
     },
     0);
     return totalPrice;
+  };
+
+  export const getBoxSizeFromString = (boxSize: string, boxSizes: boxSize[]) => {
+    return boxSizes.find(obj => obj.name == boxSize);
   };
 
   export const getFlavorFromString = (flavor: string, flavors: flavor[]) => {

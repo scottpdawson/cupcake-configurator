@@ -8,6 +8,11 @@ export interface order {
   fromEmail: string;
   fromPhone: string;
   orderDate: Date;
+  specialRequests: string;
+  isEditingSection: string;
+  isEditingItemKey: string;
+  emailSubmitted: boolean;
+  emailError: string;
 }
 
 export interface orderItem {
@@ -63,12 +68,7 @@ export const boxSizes: boxSize[] = [{
     count: 12,
     flavorMultiplier: 1,
     price: 1.75
-  }, {
-    name: "Regular 4-pack",
-    count: 12,
-    flavorMultiplier: 1,
-    price: 1.75
-  }
+  },
 ];
 
 export const cakeFlavors: flavor[] = [{
@@ -184,5 +184,10 @@ export const defaultState = {
   fromName: '',
   fromEmail: '',
   fromPhone: '',
+  specialRequests: '',
   orderDate: addDays(new Date(), 2),
+  isEditingSection: 'orderDate', 
+  isEditingItemKey: '',
+  emailSubmitted: false,
+  emailError: '',
 };
