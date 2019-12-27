@@ -1,0 +1,351 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+body {
+    background: linear-gradient(to bottom, #fdefb9 0%, #fcd135 50%);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1em;
+}
+.header {
+    background-image: url(./emoticakes.png);
+    height: 57px;
+    background-position: -169px -118px;
+    background-repeat: no-repeat;
+    background-size: auto 300px;
+    padding: 20px 20px 0 167px;
+    text-align: right;
+    border-bottom: 2px solid #FCD135;
+    margin-bottom: 0px;
+}
+.hed {
+    text-transform: uppercase;
+    font-size: .85em;
+    opacity: .7;
+    display: block;
+    margin-bottom: 5px;
+}
+h1 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 1.6em;
+}
+h4 {
+    display: block;
+    padding: 20px 30px;
+    font-size: 1.2em;
+}
+h4:hover, .orderCard .edit:hover {
+    cursor: pointer;
+}
+h4.orderDate {
+    background-color: #F6B01199;
+}
+h4.deliveryOption {
+    background-color: #5CAD6C99;
+}
+h4.yourOrder {
+    background-color: #E0216D99;
+}
+h4.requestQuote {
+    background-color: #006D9E99;
+}
+h4 .chevron {
+    position: relative;
+    top: 2px;
+    opacity: .7;
+    left: -5px;
+}
+div.padded {
+    margin: 15px 30px;
+    font-size: .9em;
+    line-height: 1.4em;
+    transition:opacity 0.5s linear;
+}
+.subTitle {
+    display: block;
+    text-transform: uppercase;
+    opacity: .8;
+    font-size: .7em;
+    margin: 5px 0px 0px 21px;
+}
+.quote-form{
+	max-width: 500px;
+}
+.quote-form label{
+	display: block;
+	margin: 0px 0px 7px 0px;
+}
+.quote-form label > span{
+    width: 100%;
+    display: block;
+	font-weight: normal;
+	padding: 0px 0px 5px 0px;
+}
+.quote-form input, 
+.quote-form .tel-number-field, 
+.quote-form .textarea-field, 
+ .quote-form .select-field{
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	border: 1px solid #C2C2C2;
+	box-shadow: 1px 1px 4px #EBEBEB;
+	-moz-box-shadow: 1px 1px 4px #EBEBEB;
+	-webkit-box-shadow: 1px 1px 4px #EBEBEB;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	padding: 7px;
+    outline: none;
+    width: 100%;
+}
+.quote-form .input-field:focus, 
+.quote-form .tel-number-field:focus, 
+.quote-form .textarea-field:focus,  
+.quote-form .select-field:focus{
+	border: 1px solid white;
+}
+.quote-form button[type=submit],
+.quote-form button[type=button]{
+	border: none;
+	padding: 8px 15px 8px 15px;
+	background: #006D9E99;
+	color: #fff;
+	box-shadow: 1px 1px 4px #DADADA;
+	-moz-box-shadow: 1px 1px 4px #DADADA;
+	-webkit-box-shadow: 1px 1px 4px #DADADA;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+.quote-form button[type=button]:disabled {
+    opacity: 0.65; 
+    cursor: not-allowed;
+    border-radius: 20px;
+}
+.quote-form input[type=submit]:hover,
+.quote-form input[type=button]:hover{
+	background: #EA7B00;
+	color: #fff;
+}
+.orderCarousel {
+    height: 270px;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+.orderCard {
+    width: 100px;
+    border: 5px dashed black;
+    opacity: .2;
+    border-radius: 10px;
+    transition: all .4s ease;
+    margin-right: 20px;
+    flex-shrink: 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.orderItem {
+    width: 160px;
+    opacity: 1;
+    background-color: rgba(253, 234, 167, 0.541);
+    border-style: solid;
+    border-color: transparent;
+    padding: 20px;
+}
+.addItemToOrder {
+    display: grid;
+    place-items: center;
+}
+.addItemToOrder:hover {
+    cursor: pointer;
+    opacity: .5;
+    background: rgba(255, 255, 255, .5);    
+}
+.orderQuantity {
+    float: left;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+.orderBoxSize {
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: .9em;
+    height: 32px;
+    width: 108px;
+    text-align: left;
+    line-height: 1.2em;
+    margin-top: -6px;
+    opacity: .8;
+    margin-left: 10px;
+}
+.orderCost {
+    position: absolute;
+    bottom: 4px;
+    display: block;
+    width: 100%;
+    left: 0;
+    font-size: 1.2em;
+    opacity: .65;
+}
+.orderDetails {
+    display: block;
+    margin-top: 10px;
+}
+.orderCard .edit, .orderCard .trash {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    transition: all 0.25s linear;
+}
+.orderCard .edit:hover, .orderCard .trash:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+.orderCard .trash {
+    color: #ec6f75;
+}
+.orderCard .trash:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+.orderCard .done {
+    border-radius: 4px;
+    display: block;
+    padding: 5px;
+    background-color: #ec6e74;
+    border-bottom: 3px solid #ea5057;
+}
+.orderCard .done:hover {
+    cursor: pointer;
+    background-color: #ea5057;
+}
+.editOrderItemBlock select {
+    display: block;
+    width: 100%;
+    margin: 2px 0px 8px;
+}
+.orderEditSectionTitle {
+    display: block;
+    font-size: .85em;
+    text-align: left;
+}
+.startOver {
+    opacity: .3;
+}
+.startOver:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+.startOverIcon {
+    width: 12px;
+    height: 12px;
+    margin-left: 5px;
+}
+.emailResult {
+    min-height: 400px;
+    text-align: center;
+    line-height: 1.5em;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    max-width: 400px;
+    margin: 0 auto;
+    margin-bottom: 100px;
+}
+.emailStatusIcon {
+    margin: 50px 0px 25px;
+    width: 100px;
+    height: 100px;
+}
+.emailResult h3 {
+    font-size: 2em;
+    margin-bottom: 50px;
+}
+.emailResult p {
+    text-align: left;
+    margin-bottom: 15px;
+}
+.cupcakeContainer {
+    position: relative;
+    width: 150px;
+    margin: 0 auto;
+}
+.cupcakeContainerLeft {
+    left: -80px;
+}
+.cupcakeContainerRight {
+    right: -80px;
+}
+.cupcakeContainer img {
+    width: 150px;
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+.cupcakeDescription {
+    position: absolute;
+    z-index: 10;
+    width: 146px;
+    background: #dedede;
+    border-radius: 30px;
+    font-family: serif;
+    font-style: italic;
+    line-height: 1em;
+    padding: 7px;
+    opacity: .85;
+    bottom: 36px;
+}
+.specialReqInstructions {
+    font-size: .9em;
+    line-height: 1.2em;
+    margin-bottom: 10px;
+}
