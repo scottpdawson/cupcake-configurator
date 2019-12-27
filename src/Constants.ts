@@ -33,7 +33,7 @@ export interface boxSize {
 
 export interface flavor {
   name: string;
-  color: string;
+  image: string;
   upCharge: number;
 }
 
@@ -71,103 +71,113 @@ export const boxSizes: boxSize[] = [{
   },
 ];
 
+const cakeDarkBrown = "cake_dark_brown";
+const cakeLightBrown = "cake_light_brown";
+const cakeWhite = "cake_white";
+const cakeRed = "cake_red";
+const cakePink = "cake_pink";
+
 export const cakeFlavors: flavor[] = [{
-    color: "#333",
+    image: cakeLightBrown,
     name: "carrot",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: cakeDarkBrown,
     name: "chocolate",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: cakeWhite,
     name: "coconut",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: cakeLightBrown,
     name: "coffee",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: cakeLightBrown,
     name: "hazelnut",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: cakeWhite,
     name: "lemon",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: cakeDarkBrown,
     name: "mocha",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: cakeWhite,
     name: "pistachio",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: cakeRed,
     name: "red velvet",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: cakeLightBrown,
     name: "spice",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: cakePink,
+    name: "strawberry",
+    upCharge: 0,
+  }, {
+    image: cakeWhite,
     name: "vanilla",
     upCharge: 0,
   }
 ];
 
 export const frostingFlavors: flavor[] = [{
-    color: "#000",
+    image: "-",
     name: "- none -",
     upCharge: 0,
   },{
-    color: "#333",
+    image: "chocolate_buttercream",
     name: "chocolate buttercream",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "coconut",
     name: "coconut",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "cookies_and_cream",
     name: "cookies and cream",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "cream_cheese",
     name: "cream cheese",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "hazelnut",
     name: "hazelnut",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: "lemon",
     name: "lemon",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: "mint_chocolate_cookie",
     name: "mint chocolate cookie",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "peanut_butter",
     name: "peanut butter",
     upCharge: 0,
   }, {
-    color: "#333",
+    image: "pistachio",
     name: "pistachio",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: "raspberry",
     name: "raspberry",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: "strawberry",
     name: "strawberry",
     upCharge: .25,
   }, {
-    color: "#333",
+    image: "vanilla_buttercream",
     name: "vanilla buttercream",
     upCharge: 0,
   }

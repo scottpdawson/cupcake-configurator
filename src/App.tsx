@@ -212,12 +212,25 @@ function App() {
               {!(state.isEditingItemKey === item.key) && <div>
                 <div className="edit" title="Edit" onClick={(e) => { setIsEditingItemKey(item.key) }}><FaEllipsisH /></div>
                 <span className="orderQuantity">{item.size.count}</span> 
-                <span className="orderBoxSize">{item.size.name}</span>
+                <span className="orderBoxSize">{item.size.name}<br />{item.cakeFlavor.name}</span>
                 <span className="orderDetails">
-                  {item.cakeFlavor.name} cupcakes w/<br />
-                  {item.frostingFlavor && item.frostingFlavor[0].name}<br />
-                  {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
-                  frosting
+                  <div className="cupcakeDescription">
+                    w/ {item.frostingFlavor && item.frostingFlavor[0].name}<br />
+                    {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
+                    frosting
+                  </div>
+                  {(item.frostingFlavor && item.frostingFlavor[1].name === '- none -') && <div className="cupcakeContainer">
+                      <img src={`./${item.cakeFlavor.image}.png`} />
+                      <img src={`./${item.frostingFlavor[0].image}.png`} />
+                  </div>}
+                  {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerLeft">
+                      <img src={`./${item.cakeFlavor.image}.png`} />
+                      <img src={`./${item.frostingFlavor[0].image}.png`} />
+                  </div>}
+                  {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerRight">
+                      <img src={`./${item.cakeFlavor.image}.png`} />
+                      <img src={`./${item.frostingFlavor[1].image}.png`} />
+                  </div>}
                 </span> 
                 <span className="orderCost">${item.totalPrice.toFixed(2)}</span>
               </div>}
@@ -374,7 +387,8 @@ function App() {
                 />
               </label>
               <label>
-                <span>Special Requests (message, design?)</span>
+                <span>Special Requests (basic lettering or additional design)</span>
+                <p className="specialReqInstructions">Additional decoration is not included in the above quoted prices, and starts at $3 per dozen for basic lettering (<a href="https://www.instagram.com/p/BtUYYVHA2kn/" target="_blank">example</a>).</p>
                 <input
                   type="text"
                   name="specialRequests"
