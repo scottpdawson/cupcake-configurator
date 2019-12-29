@@ -76,8 +76,8 @@ function App() {
         frostingUpcharge += (f.name != "- none -") ? f.upCharge : 0;
       });
 
-      // if it's a cupcake order, void upcharges
-      if (!i.size.hasTwoFrostings) {
+      // if it's a cake order, void upcharges
+      if (!i.size.cupcakesPerRow) {
         frostingUpcharge = 0;
         cakeUpcharge = 0;
       }
@@ -148,7 +148,7 @@ function App() {
     let thisOrderItem = getOrderItemFromKey(currentOrder, orderItemToUpdate);
     let thisMessage = e.target.value;
     let canUpdateMessage = true;
-    if (thisOrderItem && thisOrderItem.size.hasTwoFrostings && thisMessage.length > maxCount) {
+    if (thisOrderItem && thisOrderItem.size.cupcakesPerRow && thisMessage.length > maxCount) {
       // can't update message for cupcakes if beyond threshold
       canUpdateMessage = false;
     } 
@@ -260,7 +260,7 @@ function App() {
                     {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
                     frosting
                   </div>
-                  {item.size.hasTwoFrostings && <div>
+                  {item.size.cupcakesPerRow > 0 && <div>
                     {(item.frostingFlavor && item.frostingFlavor[1].name === '- none -') && <div className="cupcakeContainer">
                         <img src={`./${item.cakeFlavor.image}.png`} />
                         <img src={`./${item.frostingFlavor[0].image}.png`} />
@@ -274,7 +274,7 @@ function App() {
                         <img src={`./${item.frostingFlavor[1].image}.png`} />
                     </div>}
                   </div>}
-                  {!item.size.hasTwoFrostings && 
+                  {!item.size.cupcakesPerRow && 
                     item.frostingFlavor && 
                     <div className="cakeContainer" style={{background: `url(./${item.frostingFlavor[0].image}.png) -140px -50px  no-repeat`}}>
                   </div>}
@@ -293,7 +293,7 @@ function App() {
                     onChange={e => updateCakeMessage(e, item.key, item.size.count)}
                   />
                   <div className="letterContainerWrapper">
-                    {item.size.hasTwoFrostings && <div>
+                    {item.size.cupcakesPerRow > 0 && <div>
                       {Object.keys(item.message.split('')).map((letter, i) => (
                         <span key={i}>
                           <div className="cupcakeLetter">
@@ -328,7 +328,7 @@ function App() {
                     {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                       <option key={i} value={cakeFlavors[i].name}>
                         {cakeFlavors[i].name}
-                        {cakeFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                        {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
                       </option>
                     ))}
                   </select>
@@ -340,7 +340,7 @@ function App() {
                       {Object.keys(frostingFlavors).map((thisFlavor, i) => (
                         <option key={i} value={frostingFlavors[i].name}>
                           {frostingFlavors[i].name}
-                          {frostingFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                          {frostingFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
                         </option>
                       ))}
                     </select>
@@ -353,7 +353,7 @@ function App() {
                         {Object.keys(frostingFlavors).map((thisFlavor, i) => (
                           <option key={i} value={frostingFlavors[i].name}>
                             {frostingFlavors[i].name}
-                            {frostingFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                            {frostingFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
                           </option>
                         ))}
                       </select>
@@ -491,7 +491,7 @@ function App() {
               <label>
                 <span>Any other special notes?</span>
                 <p className="specialReqInstructions">
-                  Let me know if you have any preferences for colors or specific design guidance. 
+                  Let me know if you have any preferences for colors, gluten free or vegan flavors (available for some combinations), or specific design guidance. 
                   Additional decoration may add to the cost, but let me know what you're looking for!
                 </p>
                 <input

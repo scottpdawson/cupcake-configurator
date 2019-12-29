@@ -79,7 +79,7 @@ export const boxSizes: boxSize[] = [{
     messagePrice: 6,
     cupcakesPerRow: 6,
     hasFilling: false,
-    hasTwoFrostings: true,
+    hasTwoFrostings: false,
   }, {
     id: "12REG",
     name: "Regular Cupcakes",
@@ -115,7 +115,7 @@ export const boxSizes: boxSize[] = [{
     name: "1/4 Sheet Cake (no filling)",
     count: 1,
     flavorMultiplier: 1,
-    price: 25,
+    price: 28,
     messagePrice: 0,
     cupcakesPerRow: 0,
     hasFilling: false,
@@ -125,7 +125,7 @@ export const boxSizes: boxSize[] = [{
     name: "1/4 Sheet Cake (with filling)",
     count: 1,
     flavorMultiplier: 1,
-    price: 30,
+    price: 33,
     messagePrice: 0,
     cupcakesPerRow: 0,
     hasFilling: true,
@@ -135,7 +135,7 @@ export const boxSizes: boxSize[] = [{
     name: "1/2 Sheet Cake (no filling)",
     count: 1,
     flavorMultiplier: 1,
-    price: 45,
+    price: 48,
     messagePrice: 0,
     cupcakesPerRow: 0,
     hasFilling: false,
@@ -145,7 +145,7 @@ export const boxSizes: boxSize[] = [{
     name: "1/2 Sheet Cake (with filling)",
     count: 1,
     flavorMultiplier: 1,
-    price: 50,
+    price: 55,
     messagePrice: 0,
     cupcakesPerRow: 0,
     hasFilling: true,
@@ -228,27 +228,27 @@ export const frostingFlavors: flavor[] = [{
     upCharge: 0,
   }, {
     image: "coconut",
-    name: "coconut",
+    name: "coconut buttercream",
     upCharge: 0,
   }, {
     image: "cookies_and_cream",
-    name: "cookies and cream",
+    name: "chocolate cookies and cream buttercream",
     upCharge: 0,
   }, {
     image: "cream_cheese",
-    name: "cream cheese",
+    name: "cream cheese frosting",
     upCharge: 0,
   }, {
     image: "hazelnut",
-    name: "hazelnut",
+    name: "hazelnut buttercream",
     upCharge: .25,
   }, {
     image: "lemon",
-    name: "lemon",
+    name: "lemon buttercream",
     upCharge: .25,
   }, {
     image: "mint_chocolate_cookie",
-    name: "mint chocolate cookie",
+    name: "mint chocolate cookie buttercream",
     upCharge: 0,
   }, {
     image: "peanut_butter",
@@ -256,15 +256,15 @@ export const frostingFlavors: flavor[] = [{
     upCharge: 0,
   }, {
     image: "pistachio",
-    name: "pistachio",
+    name: "pistachio buttercream",
     upCharge: .25,
   }, {
     image: "raspberry",
-    name: "raspberry",
+    name: "raspberry buttercream",
     upCharge: .25,
   }, {
     image: "strawberry",
-    name: "strawberry",
+    name: "strawberry buttercream",
     upCharge: .25,
   }, {
     image: "vanilla_buttercream",
@@ -277,36 +277,57 @@ export const fillingFlavors: flavor[] = [{
     name: "banana mousse",
     upCharge: 0,
   }, {
-    name: "cherry",
+    name: "cherry filling",
     upCharge: 0,
   }, {
-    name: "cookies & cream",
+    name: "chocolate buttercream",
     upCharge: 0,
   }, {
-    name: "hazelnut",
+    name: "chocolate cookies and cream buttercream",
     upCharge: 0,
   }, {
-    name: "heath bar",
+    name: "coconut buttercream",
+    upCharge: 0,
+  }, {
+    name: "cream cheese frosting",
+    upCharge: 0,
+  }, {
+    name: "hazelnut buttercream",
+    upCharge: 0,
+  }, {
+    name: "heath bar filling",
+    upCharge: 0,
+  }, {
+    name: "lemon buttercream",
     upCharge: 0,
   }, {
     name: "lemon cream",
     upCharge: 0,
   }, {
-    name: "mint chocolate cookie",
+    name: "mint chocolate cookie buttercream",
     upCharge: 0,
   }, {
-    name: "pistachio",
+    name: "pistachio buttercream",
     upCharge: 0,
   }, {
-    name: "raspberry",
+    name: "raspberry buttercream",
     upCharge: 0,
   }, {
-    name: "strawberry",
+    name: "raspberry filling",
     upCharge: 0,
   }, {
-    name: "vanilla cookies & cream",
+    name: "strawberry buttercream",
     upCharge: 0,
-  },
+  }, {
+    name: "strawberry filling",
+    upCharge: 0,
+  }, {
+    name: "vanilla buttercream",
+    upCharge: 0,
+  }, {
+    name: "vanilla cookies and cream buttercream",
+    upCharge: 0,
+  }
 ];
 
 export const referralSources: string[] = [
