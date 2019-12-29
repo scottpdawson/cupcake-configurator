@@ -2,6 +2,7 @@
   "name": "cupcake-configurator",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://emoticakes.com/order-quote",
   "dependencies": {
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.8",
@@ -10,12 +11,20 @@
     "bootstrap": "^4.3.1",
     "emailjs-com": "^2.4.1",
     "jquery": "^3.4.1",
+    "moment": "^2.24.0",
+    "node-sass": "^4.13.0",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
+    "react-animated-css": "^1.2.1",
     "react-datepicker": "^2.10.1",
     "react-dom": "^16.8.6",
+    "react-expand-animated": "^1.0.1",
+    "react-icons": "^3.8.0",
+    "react-moment": "^0.9.7",
     "react-scripts": "2.1.8",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "velocity-animate": "^1.5.2",
+    "velocity-react": "^1.4.3"
   },
   "scripts": {
     "start": "react-scripts start",
