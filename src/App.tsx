@@ -9,11 +9,14 @@ import {
   boxSizes,
   flavor,
   cakeFlavors,
+  referralSources,
   deliveryOption,
   deliveryOptions,
   frostingFlavors,
+  fillingFlavors,
   defaultCakeFlavor,
   defaultFrostingFlavor,
+  defaultFillingFlavor,
   defaultNullFrostingFlavor
 } from "./Constants";
 import {
@@ -65,15 +68,24 @@ function App() {
       let basePrice = i.basePrice;
       let quantity = i.size.count;
       let cakeUpcharge = quantity * i.cakeFlavor.upCharge * i.size.flavorMultiplier;
+      let messageCharge = i.message ? i.size.messagePrice : 0;
       let numberOfFlavors = 0;
       let frostingUpcharge = 0;
       i.frostingFlavor.forEach((f: flavor) => {
         numberOfFlavors += (f.name != "- none -") ? 1 : 0;
         frostingUpcharge += (f.name != "- none -") ? f.upCharge : 0;
       });
+
+      // if it's a cupcake order, void upcharges
+      if (!i.size.hasTwoFrostings) {
+        frostingUpcharge = 0;
+        cakeUpcharge = 0;
+      }
+
       i.totalPrice = 
         basePrice + 
         cakeUpcharge + 
+        messageCharge + 
         (((frostingUpcharge * quantity) / numberOfFlavors) * i.size.flavorMultiplier);
     });
 
@@ -89,7 +101,9 @@ function App() {
     currentOrder.push({
       key: newItemKey,
       size: newItem,
+      message: "",
       cakeFlavor: defaultCakeFlavor,
+      fillingFlavor: defaultFillingFlavor,
       frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
       flavorMultiplier: newItem.flavorMultiplier,
       basePrice: newItem.price * newItem.count,
@@ -125,6 +139,31 @@ function App() {
     let cakeFlavor = getFlavorFromString(e.target.value, cakeFlavors);
     if (thisOrderItem && cakeFlavor) {
       thisOrderItem.cakeFlavor = cakeFlavor;
+      updateOrderDetails(currentOrder);
+    }
+  };
+
+  const updateCakeMessage = (e: any, orderItemToUpdate: string, maxCount: number) => {
+    let currentOrder = getCurrentOrder(state);
+    let thisOrderItem = getOrderItemFromKey(currentOrder, orderItemToUpdate);
+    let thisMessage = e.target.value;
+    let canUpdateMessage = true;
+    if (thisOrderItem && thisOrderItem.size.hasTwoFrostings && thisMessage.length > maxCount) {
+      // can't update message for cupcakes if beyond threshold
+      canUpdateMessage = false;
+    } 
+    if (thisOrderItem && canUpdateMessage) {
+      thisOrderItem.message = thisMessage;
+      updateOrderDetails(currentOrder);
+    }
+  };
+
+  const updateFillingFlavor = (e: any, orderItemToUpdate: string) => {
+    let currentOrder = getCurrentOrder(state);
+    let thisOrderItem = getOrderItemFromKey(currentOrder, orderItemToUpdate);
+    let fillingFlavor = getFlavorFromString(e.target.value, fillingFlavors);
+    if (thisOrderItem && fillingFlavor) {
+      thisOrderItem.fillingFlavor = fillingFlavor;
       updateOrderDetails(currentOrder);
     }
   };
@@ -206,6 +245,7 @@ function App() {
     return <div>
       {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
+        <p className="bypassInstructions">Looking for something more custom than the options in this section? Skip to "Request a Quote" and tell me what you're looking for in the notes. See my <a href="https://emoticakes.com/gallery/" target="_blank">gallery</a> for inspiration.</p>
         <div className="padded orderCarousel">
           {state.orderDetails.map((item: orderItem) => (
             <div key={item.key} className="orderItem orderCard">
@@ -215,35 +255,68 @@ function App() {
                 <span className="orderBoxSize">{item.size.name}<br />{item.cakeFlavor.name}</span>
                 <span className="orderDetails">
                   <div className="cupcakeDescription">
-                    w/ {item.frostingFlavor && item.frostingFlavor[0].name}<br />
+                    w/ {item.size.hasFilling && <span>{item.fillingFlavor.name} filling and </span>} 
+                    {item.frostingFlavor && item.frostingFlavor[0].name}<br />
                     {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
                     frosting
                   </div>
-                  {(item.frostingFlavor && item.frostingFlavor[1].name === '- none -') && <div className="cupcakeContainer">
-                      <img src={`./${item.cakeFlavor.image}.png`} />
-                      <img src={`./${item.frostingFlavor[0].image}.png`} />
+                  {item.size.hasTwoFrostings && <div>
+                    {(item.frostingFlavor && item.frostingFlavor[1].name === '- none -') && <div className="cupcakeContainer">
+                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        <img src={`./${item.frostingFlavor[0].image}.png`} />
+                    </div>}
+                    {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerLeft">
+                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        <img src={`./${item.frostingFlavor[0].image}.png`} />
+                    </div>}
+                    {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerRight">
+                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        <img src={`./${item.frostingFlavor[1].image}.png`} />
+                    </div>}
                   </div>}
-                  {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerLeft">
-                      <img src={`./${item.cakeFlavor.image}.png`} />
-                      <img src={`./${item.frostingFlavor[0].image}.png`} />
-                  </div>}
-                  {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerRight">
-                      <img src={`./${item.cakeFlavor.image}.png`} />
-                      <img src={`./${item.frostingFlavor[1].image}.png`} />
+                  {!item.size.hasTwoFrostings && 
+                    item.frostingFlavor && 
+                    <div className="cakeContainer" style={{background: `url(./${item.frostingFlavor[0].image}.png) -140px -50px  no-repeat`}}>
                   </div>}
                 </span> 
-                <span className="orderCost">${item.totalPrice.toFixed(2)}</span>
+                <span className="orderCostAndMessage">
+                  <p>
+                    Optional Message {item.size.messagePrice > 0 ? <span>(+${item.size.messagePrice})&nbsp; 
+                      {item.size.id === '24MINI' && <a href="./24MINI.jpg" target="_blank">example</a>}
+                      {item.size.id === '12REG' && <a href="./12REG.jpg" target="_blank">example</a>}
+                      {item.size.id === '24REG' && <a href="./24REG.jpg" target="_blank">example</a>}
+                    </span> : <span>(included)</span>}
+                  </p>
+                  <input
+                    type="text"
+                    value={item.message}
+                    onChange={e => updateCakeMessage(e, item.key, item.size.count)}
+                  />
+                  <div className="letterContainerWrapper">
+                    {item.size.hasTwoFrostings && <div>
+                      {Object.keys(item.message.split('')).map((letter, i) => (
+                        <span key={i}>
+                          <div className="cupcakeLetter">
+                            {item.message.split('')[i] != " " ? item.message.split('')[i] : "_"}
+                          </div>
+                          {(i+1) % item.size.cupcakesPerRow === 0 && <br />}
+                        </span>
+                      ))}
+                    </div>}
+                  </div>
+                  <span className="cost">${item.totalPrice.toFixed(2)}</span>
+                </span>
               </div>}
               {(state.isEditingItemKey === item.key) && <div className="editOrderItemBlock">
                 <div className="trash" title="Delete" onClick={e => removeFromOrder(item.key)}><FaTrashAlt /></div>
-                <span className="orderEditSectionTitle">Cupcake Size</span>
+                <span className="orderEditSectionTitle">Cake Size</span>
                 <select
-                      value={item.size && item.size.name}
+                      value={item.size && item.size.id}
                       onChange={e => updateBoxSize(e, item.key)}
                     >
                       {Object.keys(boxSizes).map((thisBoxSize, i) => (
-                        <option key={i} value={boxSizes[i].name}>
-                          {boxSizes[i].count} {boxSizes[i].name} (${boxSizes[i].price} ea)
+                        <option key={i} value={boxSizes[i].id}>
+                          {boxSizes[i].count > 1 ? boxSizes[i].count : ''} {boxSizes[i].name} (${boxSizes[i].price} ea)
                         </option>
                       ))}
                     </select>
@@ -255,7 +328,7 @@ function App() {
                     {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                       <option key={i} value={cakeFlavors[i].name}>
                         {cakeFlavors[i].name}
-                        {cakeFlavors[i].upCharge ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                        {cakeFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
                       </option>
                     ))}
                   </select>
@@ -267,22 +340,38 @@ function App() {
                       {Object.keys(frostingFlavors).map((thisFlavor, i) => (
                         <option key={i} value={frostingFlavors[i].name}>
                           {frostingFlavors[i].name}
-                          {frostingFlavors[i].upCharge ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                          {frostingFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
                         </option>
                       ))}
                     </select>
-                    <span className="orderEditSectionTitle">2nd Frosting (optional)</span>
-                    <select
-                      value={item.frostingFlavor[1] && item.frostingFlavor[1].name}
-                      onChange={e => updateFrostingFlavor(e, item.key, 1)}
-                    >
-                      {Object.keys(frostingFlavors).map((thisFlavor, i) => (
-                        <option key={i} value={frostingFlavors[i].name}>
-                          {frostingFlavors[i].name}
-                          {frostingFlavors[i].upCharge ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
-                        </option>
-                      ))}
-                    </select>
+                    {item.size.hasTwoFrostings && <div>
+                      <span className="orderEditSectionTitle">2nd Frosting (optional)</span>
+                      <select
+                        value={item.frostingFlavor[1] && item.frostingFlavor[1].name}
+                        onChange={e => updateFrostingFlavor(e, item.key, 1)}
+                      >
+                        {Object.keys(frostingFlavors).map((thisFlavor, i) => (
+                          <option key={i} value={frostingFlavors[i].name}>
+                            {frostingFlavors[i].name}
+                            {frostingFlavors[i].upCharge && item.size.hasTwoFrostings ? " (+$" + (frostingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>}
+                    {item.size.hasFilling && <div>
+                      <span className="orderEditSectionTitle">Filling</span>
+                      <select
+                        value={item.fillingFlavor && item.fillingFlavor.name}
+                        onChange={e => updateFillingFlavor(e, item.key)}
+                      >
+                        {Object.keys(fillingFlavors).map((thisFlavor, i) => (
+                          <option key={i} value={fillingFlavors[i].name}>
+                            {fillingFlavors[i].name}
+                            {fillingFlavors[i].upCharge ? " (+$" + (fillingFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>}
                 <span className="done" onClick={(e) => { setIsEditingItemKey('') }}>Done</span>
               </div>}
             </div>
@@ -320,10 +409,11 @@ function App() {
       from_name: state.fromName,
       from_email: state.fromEmail,
       from_phone: state.fromPhone,
+      referral_source: state.referralSource,
       special_requests: state.specialRequests,
-      order_date: format(state.orderDate, "MMMM d YYYY", {
+      order_date: format(state.orderDate, "MMMM d yyyy", {
         useAdditionalWeekYearTokens: true,
-        useAdditionalDayOfYearTokens: true
+        useAdditionalDayOfYearTokens: true,
       }),
       delivery: state.deliveryOption.name + " ($" + state.deliveryOption.price + ")",
       total: state.orderTotal.toFixed(2),
@@ -387,8 +477,23 @@ function App() {
                 />
               </label>
               <label>
-                <span>Special Requests (basic lettering or additional design)</span>
-                <p className="specialReqInstructions">Additional decoration is not included in the above quoted prices, and starts at $3 per dozen for basic lettering (<a href="https://www.instagram.com/p/BtUYYVHA2kn/" target="_blank">example</a>).</p>
+                <span>How did you hear about Emoticakes?</span>
+                <select
+                    name="referralSource"
+                    value={state.referralSource}
+                    onChange={e => updateOrderContactDetails(e)}
+                  >
+                    {Object.keys(referralSources).map((thisSource, i) => (
+                      <option key={i} value={referralSources[i]}>{referralSources[i]}</option>
+                    ))}
+                  </select>
+              </label>
+              <label>
+                <span>Any other special notes?</span>
+                <p className="specialReqInstructions">
+                  Let me know if you have any preferences for colors or specific design guidance. 
+                  Additional decoration may add to the cost, but let me know what you're looking for!
+                </p>
                 <input
                   type="text"
                   name="specialRequests"
@@ -399,7 +504,7 @@ function App() {
             </ul>
             <button
               type="button"
-              disabled={canSubmitOrder(state)}
+              disabled={!canSubmitOrder(state)}
               onClick={(e) => emailOrderRequest(state)}
             >
               Submit Quote Request
@@ -421,7 +526,7 @@ function App() {
             <FaRedoAlt className="startOverIcon" />
           </span>
         </span>
-        <h1>Cupcake Quote</h1>
+        <h1>Order Quote</h1>
       </div>
       {!state.emailSubmitted && <div>
         {orderDateSection()}

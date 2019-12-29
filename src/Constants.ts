@@ -13,6 +13,7 @@ export interface order {
   isEditingItemKey: string;
   emailSubmitted: boolean;
   emailError: string;
+  referralSource: string;
 }
 
 export interface orderItem {
@@ -20,20 +21,27 @@ export interface orderItem {
   size: boxSize;
   cakeFlavor: flavor;
   frostingFlavor: flavor[];
+  fillingFlavor: flavor;
   basePrice: number;
   totalPrice: number;
+  message: string;
 }
 
 export interface boxSize {
+  id: string;
   name: string;
   count: number;
   flavorMultiplier: number; // used for flavor price variance for minis
   price: number;
+  messagePrice: number;
+  cupcakesPerRow: number;
+  hasFilling: boolean;
+  hasTwoFrostings: boolean;
 }
 
 export interface flavor {
   name: string;
-  image: string;
+  image?: string;
   upCharge: number;
 }
 
@@ -49,25 +57,99 @@ export const deliveryOptions: deliveryOption[] = [{
     price: 0,
   }, {
     key: 2,
-    name: "Deliver to Trumansburg",
-    price: 5,
+    name: "Deliver to Trumansburg Village (free)",
+    price: 0,
   }, {
     key: 3,
     name: "Deliver to Ithaca area",
-    price: 5,
+    price: 6,
+  }, {
+    key: 4,
+    name: "Other delivery area (confirm price w/ me)",
+    price: 0,
   }
 ];
 
 export const boxSizes: boxSize[] = [{
-    name: "Mini",
+    id: "24MINI",
+    name: "Mini Cupcakes",
     count: 24,
     flavorMultiplier: 1/3, // mini flavor increments are 3:1
     price: .85,
+    messagePrice: 6,
+    cupcakesPerRow: 6,
+    hasFilling: false,
+    hasTwoFrostings: true,
   }, {
-    name: "Regular",
+    id: "12REG",
+    name: "Regular Cupcakes",
     count: 12,
     flavorMultiplier: 1,
-    price: 1.75
+    price: 1.75,
+    messagePrice: 3,
+    cupcakesPerRow: 4,
+    hasFilling: false,
+    hasTwoFrostings: true,
+  }, {
+    id: "24REG",
+    name: "Regular Cupcakes",
+    count: 24,
+    flavorMultiplier: 1,
+    price: 1.75,
+    messagePrice: 6,
+    cupcakesPerRow: 6,
+    hasFilling: false,
+    hasTwoFrostings: true,
+  }, {
+    id: "8LAYER",
+    name: "8\" Layer Cake",
+    count: 1,
+    flavorMultiplier: 1,
+    price: 30,
+    messagePrice: 0,
+    cupcakesPerRow: 0,
+    hasFilling: true,
+    hasTwoFrostings: false,
+  }, {
+    id: "QUARTER",
+    name: "1/4 Sheet Cake (no filling)",
+    count: 1,
+    flavorMultiplier: 1,
+    price: 25,
+    messagePrice: 0,
+    cupcakesPerRow: 0,
+    hasFilling: false,
+    hasTwoFrostings: false,
+  }, {
+    id: "QUARTERFILLED",
+    name: "1/4 Sheet Cake (with filling)",
+    count: 1,
+    flavorMultiplier: 1,
+    price: 30,
+    messagePrice: 0,
+    cupcakesPerRow: 0,
+    hasFilling: true,
+    hasTwoFrostings: false,
+  }, {
+    id: "HALF",
+    name: "1/2 Sheet Cake (no filling)",
+    count: 1,
+    flavorMultiplier: 1,
+    price: 45,
+    messagePrice: 0,
+    cupcakesPerRow: 0,
+    hasFilling: false,
+    hasTwoFrostings: false,
+  }, {
+    id: "HALFFILLED",
+    name: "1/2 Sheet Cake (with filling)",
+    count: 1,
+    flavorMultiplier: 1,
+    price: 50,
+    messagePrice: 0,
+    cupcakesPerRow: 0,
+    hasFilling: true,
+    hasTwoFrostings: false,
   },
 ];
 
@@ -78,6 +160,10 @@ const cakeRed = "cake_red";
 const cakePink = "cake_pink";
 
 export const cakeFlavors: flavor[] = [{
+    image: cakeLightBrown,
+    name: "almond",
+    upCharge: 0,
+  }, {
     image: cakeLightBrown,
     name: "carrot",
     upCharge: .25,
@@ -102,6 +188,10 @@ export const cakeFlavors: flavor[] = [{
     name: "lemon",
     upCharge: .25,
   }, {
+    image: cakeLightBrown,
+    name: "marble",
+    upCharge: 0,
+  }, {
     image: cakeDarkBrown,
     name: "mocha",
     upCharge: 0,
@@ -112,7 +202,7 @@ export const cakeFlavors: flavor[] = [{
   }, {
     image: cakeRed,
     name: "red velvet",
-    upCharge: 0,
+    upCharge: .25,
   }, {
     image: cakeLightBrown,
     name: "spice",
@@ -120,7 +210,7 @@ export const cakeFlavors: flavor[] = [{
   }, {
     image: cakePink,
     name: "strawberry",
-    upCharge: 0,
+    upCharge: .25,
   }, {
     image: cakeWhite,
     name: "vanilla",
@@ -183,9 +273,55 @@ export const frostingFlavors: flavor[] = [{
   }
 ];
 
+export const fillingFlavors: flavor[] = [{
+    name: "banana mousse",
+    upCharge: 0,
+  }, {
+    name: "cherry",
+    upCharge: 0,
+  }, {
+    name: "cookies & cream",
+    upCharge: 0,
+  }, {
+    name: "hazelnut",
+    upCharge: 0,
+  }, {
+    name: "heath bar",
+    upCharge: 0,
+  }, {
+    name: "lemon cream",
+    upCharge: 0,
+  }, {
+    name: "mint chocolate cookie",
+    upCharge: 0,
+  }, {
+    name: "pistachio",
+    upCharge: 0,
+  }, {
+    name: "raspberry",
+    upCharge: 0,
+  }, {
+    name: "strawberry",
+    upCharge: 0,
+  }, {
+    name: "vanilla cookies & cream",
+    upCharge: 0,
+  },
+];
+
+export const referralSources: string[] = [
+  "Friend", 
+  "Internet Search", 
+  "Repeat Customer", 
+  "Phone Book", 
+  "Advertisement", 
+  "Facebook"
+];
+
 export const defaultCakeFlavor = cakeFlavors[cakeFlavors.length-1];
 export const defaultFrostingFlavor = frostingFlavors[frostingFlavors.length-1];
 export const defaultNullFrostingFlavor = frostingFlavors[0];
+export const defaultFillingFlavor = fillingFlavors[0];
 
 export const defaultState = {
   orderTotal: 0,
@@ -200,4 +336,5 @@ export const defaultState = {
   isEditingItemKey: '',
   emailSubmitted: false,
   emailError: '',
+  referralSource: referralSources[0],
 };

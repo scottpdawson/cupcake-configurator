@@ -47,7 +47,6 @@ table {
 	border-spacing: 0;
 }
 body {
-    background: linear-gradient(to bottom, #fdefb9 0%, #fcd135 50%);
     font-family: Arial, Helvetica, sans-serif;
     font-size: 1em;
 }
@@ -173,7 +172,7 @@ div.padded {
 	color: #fff;
 }
 .orderCarousel {
-    height: 270px;
+    height: 430px;
     display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -225,18 +224,29 @@ div.padded {
     opacity: .8;
     margin-left: 10px;
 }
-.orderCost {
+.orderCostAndMessage {
     position: absolute;
     bottom: 4px;
     display: block;
     width: 100%;
     left: 0;
     font-size: 1.2em;
+}
+.orderCostAndMessage .cost {
     opacity: .65;
+    display: block;
+}
+.orderCostAndMessage input {
+    width: 90%;
+    margin-bottom: 8px;
+}
+.orderCostAndMessage p {
+    font-size: 12px;
+    opacity: .7;
 }
 .orderDetails {
     display: block;
-    margin-top: 10px;
+    margin-top: 3px;
 }
 .orderCard .edit, .orderCard .trash {
     position: absolute;
@@ -263,7 +273,7 @@ div.padded {
     border-radius: 4px;
     display: block;
     padding: 5px;
-    background-color: #ec6e74;
+    background-color: #E0216D99;
     border-bottom: 3px solid #ea5057;
 }
 .orderCard .done:hover {
@@ -319,6 +329,14 @@ div.padded {
     width: 150px;
     margin: 0 auto;
 }
+.cakeContainer {
+    position: relative;
+    margin: 0 auto;
+    height: 150px;
+    width: 150px;
+    border-radius: 100px;
+    box-shadow: inset 0 0 10px #000000;
+}
 .cupcakeContainerLeft {
     left: -80px;
 }
@@ -342,10 +360,32 @@ div.padded {
     line-height: 1em;
     padding: 7px;
     opacity: .85;
-    bottom: 36px;
+    bottom: 190px;
 }
 .specialReqInstructions {
     font-size: .9em;
     line-height: 1.2em;
     margin-bottom: 10px;
+}
+.cupcakeLetter {
+    background-color: white;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    margin: 2px;
+    border-radius: 20px;
+    box-shadow: 0 4px 3px -3px black;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.letterContainerWrapper {
+    width: 80%;
+    margin: 0 auto;
+    min-height: 115px;
+}
+p.bypassInstructions {
+    margin: 10px 30px 0px;
+    font-style: italic;
+    font-family: Garamond, serif;
+    opacity: .8;
 }

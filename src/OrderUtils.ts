@@ -24,15 +24,21 @@ export const summarizeOrder = (state: order) => {
         i.size.name +
         " " +
         i.cakeFlavor.name +
-        " cupcakes ($" +
+        " ($" +
         i.totalPrice.toFixed(2) +
         ")<br />"
     );
+    summary = summary.concat(
+      i.size.hasFilling ? "-- " + i.fillingFlavor.name + " filling<br />" : ""
+    );
     i.frostingFlavor.forEach((f: flavor) => {
       summary = summary.concat(
-        f.name != "- none -" ? "-- " + f.name + "<br />" : ""
+        f.name != "- none -" ? "-- " + f.name + " frosting<br />" : ""
       );
     });
+    summary = summary.concat(
+      i.message !== '' ? "-- Message: " + i.message + "<br />" : ""
+    );
     summary = summary.concat("<br />");
   });
   return summary;
@@ -40,14 +46,12 @@ export const summarizeOrder = (state: order) => {
 
 export const canSubmitOrder = (state: order) => {
     // validate whether we can submit the form or not
-    // 1. ensure user filled out all contact info
-    // 2. ensure order has at least one item
+    // ensure user filled out all contact info
     return (
-      !state.fromName ||
-      !state.fromEmail || // todo: check validity of email address
-      !state.fromPhone ||
-      !state.orderDate ||
-      state.orderTotal === 0
+      state.fromName !== '' &&
+      state.fromEmail !== '' &&
+      state.fromPhone !== '' && 
+      state.orderTotal > 0 || state.specialRequests !== ''
     );
   };
 
@@ -63,7 +67,7 @@ export const canSubmitOrder = (state: order) => {
   };
 
   export const getBoxSizeFromString = (boxSize: string, boxSizes: boxSize[]) => {
-    return boxSizes.find(obj => obj.name == boxSize);
+    return boxSizes.find(obj => obj.id == boxSize);
   };
 
   export const getFlavorFromString = (flavor: string, flavors: flavor[]) => {
