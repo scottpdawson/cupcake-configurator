@@ -22,20 +22,28 @@ export const summarizeOrder = (state: order) => {
       i.size.count +
         " " +
         i.size.name +
-        " " +
-        i.cakeFlavor.name +
         " ($" +
         i.totalPrice.toFixed(2) +
         ")<br />"
     );
+    if (i.size.id === '24REG') {
+      summary = summary.concat(
+        "-- " + i.cakeFlavor[0].name + " w/ " + i.frostingFlavor[0].name + " frosting<br />"
+      );
+      summary = summary.concat(
+        "-- " + i.cakeFlavor[1].name + " w/ " + i.frostingFlavor[1].name + " frosting<br />"
+      );
+    } else {
+      i.frostingFlavor.forEach((f: flavor) => {
+        summary = summary.concat(
+          f.name != "- none -" ? "-- " + i.cakeFlavor[0].name + " w/ " + f.name + " frosting<br />" : ""
+        );
+      });
+    }
+    
     summary = summary.concat(
       i.size.hasFilling ? "-- " + i.fillingFlavor.name + " filling<br />" : ""
     );
-    i.frostingFlavor.forEach((f: flavor) => {
-      summary = summary.concat(
-        f.name != "- none -" ? "-- " + f.name + " frosting<br />" : ""
-      );
-    });
     summary = summary.concat(
       i.message !== '' ? "-- Message: " + i.message + "<br />" : ""
     );

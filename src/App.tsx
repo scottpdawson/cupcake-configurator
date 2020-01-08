@@ -67,7 +67,15 @@ function App() {
     orderDetails.forEach((i: orderItem) => {
       let basePrice = i.basePrice;
       let quantity = i.size.count;
-      let cakeUpcharge = quantity * i.cakeFlavor.upCharge * i.size.flavorMultiplier;
+      let cakeUpcharge = quantity * i.cakeFlavor[0].upCharge * i.size.flavorMultiplier;
+
+      // recalculate cakeUpcharge if split box of 24
+      if (i.size.id === '24REG') {
+        cakeUpcharge = 
+          ((quantity/2) * i.cakeFlavor[0].upCharge * i.size.flavorMultiplier) + 
+          ((quantity/2) * i.cakeFlavor[1].upCharge * i.size.flavorMultiplier);
+      }
+
       let messageCharge = i.message ? i.size.messagePrice : 0;
       let numberOfFlavors = 0;
       let frostingUpcharge = 0;
@@ -102,7 +110,7 @@ function App() {
       key: newItemKey,
       size: newItem,
       message: "",
-      cakeFlavor: defaultCakeFlavor,
+      cakeFlavor: [defaultCakeFlavor, defaultCakeFlavor],
       fillingFlavor: defaultFillingFlavor,
       frostingFlavor: [defaultFrostingFlavor, defaultNullFrostingFlavor],
       flavorMultiplier: newItem.flavorMultiplier,
@@ -128,17 +136,25 @@ function App() {
     let boxSize = getBoxSizeFromString(e.target.value, boxSizes);
     if (thisOrderItem && boxSize) {
       thisOrderItem.size = boxSize;
+      if (!boxSize.hasTwoFrostings) {
+        // remove second frosting if item doesn't support it
+        thisOrderItem.frostingFlavor[1] = defaultNullFrostingFlavor;
+      }
+      if (boxSize.id === '24REG') {
+        // set second frosting to default
+        thisOrderItem.frostingFlavor[1] = defaultFrostingFlavor;
+      }
       thisOrderItem.basePrice = boxSize.price * boxSize.count,
       updateOrderDetails(currentOrder);
     }
   };
 
-  const updateCakeFlavor = (e: any, orderItemToUpdate: string) => {
+  const updateCakeFlavor = (e: any, orderItemToUpdate: string, flavorIndex: number) => {
     let currentOrder = getCurrentOrder(state);
     let thisOrderItem = getOrderItemFromKey(currentOrder, orderItemToUpdate);
     let cakeFlavor = getFlavorFromString(e.target.value, cakeFlavors);
     if (thisOrderItem && cakeFlavor) {
-      thisOrderItem.cakeFlavor = cakeFlavor;
+      thisOrderItem.cakeFlavor[flavorIndex] = cakeFlavor;
       updateOrderDetails(currentOrder);
     }
   };
@@ -245,32 +261,34 @@ function App() {
     return <div>
       {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
-        <p className="bypassInstructions">Looking for something more custom than the options in this section? Skip to "Request a Quote" and tell me what you're looking for in the notes. See my <a href="https://emoticakes.com/gallery/" target="_blank">gallery</a> for inspiration.</p>
+        <p className="bypassInstructions">This interactive section is here to help make choices fun! If it's confusing  or you don't see what you're looking for, skip to "Request a Quote" and tell me what you're looking for in the notes. See my <a href="https://emoticakes.com/gallery/" target="_blank">gallery</a> for inspiration.</p>
         <div className="padded orderCarousel">
           {state.orderDetails.map((item: orderItem) => (
             <div key={item.key} className="orderItem orderCard">
               {!(state.isEditingItemKey === item.key) && <div>
                 <div className="edit" title="Edit" onClick={(e) => { setIsEditingItemKey(item.key) }}><FaEllipsisH /></div>
                 <span className="orderQuantity">{item.size.count}</span> 
-                <span className="orderBoxSize">{item.size.name}<br />{item.cakeFlavor.name}</span>
+                <span className="orderBoxSize">{item.size.name}</span>
                 <span className="orderDetails">
                   <div className="cupcakeDescription">
-                    w/ {item.size.hasFilling && <span>{item.fillingFlavor.name} filling and </span>} 
-                    {item.frostingFlavor && item.frostingFlavor[0].name}<br />
-                    {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> and {item.frostingFlavor[1].name} </span> }
-                    frosting
+                    {item.cakeFlavor[0].name} w/ {item.size.hasFilling && <span>{item.fillingFlavor.name} filling and </span>} 
+                    {item.frostingFlavor && item.frostingFlavor[0].name} frosting 
+                    {item.size.id === '24REG' && <span>, {item.cakeFlavor[1].name} w/ </span>}
+                    {item.size.id !== '24REG' && (item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> &amp; </span>}
+                    {(item.frostingFlavor && item.frostingFlavor[1].name != '- none -') && <span> {item.frostingFlavor[1].name} frosting </span> }
                   </div>
                   {item.size.cupcakesPerRow > 0 && <div>
                     {(item.frostingFlavor && item.frostingFlavor[1].name === '- none -') && <div className="cupcakeContainer">
-                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        <img src={`./${item.cakeFlavor[0].image}.png`} />
                         <img src={`./${item.frostingFlavor[0].image}.png`} />
                     </div>}
                     {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerLeft">
-                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        <img src={`./${item.cakeFlavor[0].image}.png`} />
                         <img src={`./${item.frostingFlavor[0].image}.png`} />
                     </div>}
                     {(item.frostingFlavor && item.frostingFlavor[1].name !== '- none -') && <div className="cupcakeContainer cupcakeContainerRight">
-                        <img src={`./${item.cakeFlavor.image}.png`} />
+                        {item.size.id === '24REG' && <img src={`./${item.cakeFlavor[1].image}.png`} />}
+                        {item.size.id !== '24REG' && <img src={`./${item.cakeFlavor[0].image}.png`} />}
                         <img src={`./${item.frostingFlavor[1].image}.png`} />
                     </div>}
                   </div>}
@@ -320,19 +338,26 @@ function App() {
                         </option>
                       ))}
                     </select>
-                <span className="orderEditSectionTitle">Cake</span>
+                <span className="orderEditSectionTitle">
+                  Cake {item.size.id === '24REG' && <span>(1st dozen)</span>}
+                </span>
                 <select
-                    value={item.cakeFlavor && item.cakeFlavor.name}
-                    onChange={e => updateCakeFlavor(e, item.key)}
+                    value={item.cakeFlavor[0] && item.cakeFlavor[0].name}
+                    onChange={e => updateCakeFlavor(e, item.key, 0)}
                   >
                     {Object.keys(cakeFlavors).map((thisFlavor, i) => (
-                      <option key={i} value={cakeFlavors[i].name}>
-                        {cakeFlavors[i].name}
-                        {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
-                      </option>
+                        <option key={i} 
+                          value={cakeFlavors[i].name} 
+                          style={{display: (cakeFlavors[i].name !== 'chocolate + vanilla') || (item.size.id).includes("HALF") ? 'block': 'none'}}
+                        >
+                          {cakeFlavors[i].name}
+                          {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                        </option>
                     ))}
                   </select>
-                  <span className="orderEditSectionTitle">Frosting</span>
+                  <span className="orderEditSectionTitle">
+                    Frosting {item.size.id === '24REG' && <span>(1st dozen)</span>}
+                  </span>
                   <select
                       value={item.frostingFlavor && item.frostingFlavor[0].name}
                       onChange={e => updateFrostingFlavor(e, item.key, 0)}
@@ -344,8 +369,28 @@ function App() {
                         </option>
                       ))}
                     </select>
+                    {item.size.id === '24REG' && <div>
+                      <span className="orderEditSectionTitle">Cake (2nd dozen)</span>
+                      <select
+                          value={item.cakeFlavor[1] && item.cakeFlavor[1].name}
+                          onChange={e => updateCakeFlavor(e, item.key, 1)}
+                        >
+                          {Object.keys(cakeFlavors).map((thisFlavor, i) => (
+                              <option key={i} 
+                                value={cakeFlavors[i].name} 
+                                style={{display: (cakeFlavors[i].name !== 'chocolate + vanilla') || (item.size.id).includes("HALF") ? 'block': 'none'}}
+                              >
+                                {cakeFlavors[i].name}
+                                {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
+                              </option>
+                          ))}
+                      </select>
+                    </div>}
                     {item.size.hasTwoFrostings && <div>
-                      <span className="orderEditSectionTitle">2nd Frosting (optional)</span>
+                      <span className="orderEditSectionTitle">
+                        {item.size.id !== '24REG' && <span>2nd Frosting (optional)</span>}
+                        {item.size.id === '24REG' && <span>Frosting (2nd dozen)</span>}
+                      </span>
                       <select
                         value={item.frostingFlavor[1] && item.frostingFlavor[1].name}
                         onChange={e => updateFrostingFlavor(e, item.key, 1)}
@@ -502,6 +547,7 @@ function App() {
                 />
               </label>
             </ul>
+            {!canSubmitOrder(state) && <p className="specialReqInstructions">To submit, fill our your contact information and either add an item in Order Details OR a special note above.</p>}
             <button
               type="button"
               disabled={!canSubmitOrder(state)}

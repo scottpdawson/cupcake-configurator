@@ -77,7 +77,7 @@ h4 {
     padding: 20px 30px;
     font-size: 1.2em;
 }
-h4:hover, .orderCard .edit:hover {
+h4:hover, .orderCard .edit:hover, .quote-form button:hover {
     cursor: pointer;
 }
 h4.orderDate {

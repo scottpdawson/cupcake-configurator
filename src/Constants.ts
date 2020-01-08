@@ -19,7 +19,7 @@ export interface order {
 export interface orderItem {
   key: string;
   size: boxSize;
-  cakeFlavor: flavor;
+  cakeFlavor: flavor[];
   frostingFlavor: flavor[];
   fillingFlavor: flavor;
   basePrice: number;
@@ -105,7 +105,7 @@ export const boxSizes: boxSize[] = [{
     name: "8\" Layer Cake",
     count: 1,
     flavorMultiplier: 1,
-    price: 30,
+    price: 33,
     messagePrice: 0,
     cupcakesPerRow: 0,
     hasFilling: true,
@@ -170,6 +170,10 @@ export const cakeFlavors: flavor[] = [{
   }, {
     image: cakeDarkBrown,
     name: "chocolate",
+    upCharge: 0,
+  }, {
+    image: cakeDarkBrown,
+    name: "chocolate + vanilla",
     upCharge: 0,
   }, {
     image: cakeWhite,
