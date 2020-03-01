@@ -4,7 +4,8 @@ export interface order {
   orderTotal: number;
   orderDetails: orderItem[];
   deliveryOption: deliveryOption;
-  fromName: string;
+  fromFirstName: string;
+  fromLastName: string;
   fromEmail: string;
   fromPhone: string;
   orderDate: Date;
@@ -352,7 +353,8 @@ export const defaultState = {
   orderTotal: 0,
   orderDetails: [],
   deliveryOption: deliveryOptions[0],
-  fromName: '',
+  fromFirstName: '',
+  fromLastName: '',
   fromEmail: '',
   fromPhone: '',
   specialRequests: '',

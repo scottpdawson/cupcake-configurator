@@ -451,7 +451,7 @@ function App() {
 
   const emailOrderRequest = (state: order) => {
     var templateParams = {
-      from_name: state.fromName,
+      from_name: state.fromFirstName + ' ' + state.fromLastName,
       from_email: state.fromEmail,
       from_phone: state.fromPhone,
       referral_source: state.referralSource,
@@ -495,11 +495,20 @@ function App() {
           <form className="quote-form">
             <ul>
               <label>
-                <span>Name</span>
+                <span>First Name</span>
                 <input
                   type="text"
-                  name="fromName"
-                  value={state.fromName}
+                  name="fromFirstName"
+                  value={state.fromFirstName}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Last Name</span>
+                <input
+                  type="text"
+                  name="fromLastName"
+                  value={state.fromLastName}
                   onChange={updateOrderContactDetails}
                 />
               </label>

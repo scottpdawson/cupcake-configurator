@@ -56,10 +56,11 @@ export const canSubmitOrder = (state: order) => {
     // validate whether we can submit the form or not
     // ensure user filled out all contact info
     return (
-      state.fromName !== '' &&
-      state.fromEmail !== '' &&
-      state.fromPhone !== '' && 
-      state.orderTotal > 0 || state.specialRequests !== ''
+      state.fromFirstName &&
+      state.fromLastName &&
+      state.fromEmail &&
+      state.fromPhone && 
+      (state.orderTotal > 0 || state.specialRequests)
     );
   };
 
