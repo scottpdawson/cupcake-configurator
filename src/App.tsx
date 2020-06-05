@@ -465,7 +465,7 @@ function App() {
       quote_details: summarizeOrder(state)
     };
 
-    emailjs
+    config.emailjs.templateID && emailjs
       .send(
         config.emailjs.serviceID,
         config.emailjs.templateID,
