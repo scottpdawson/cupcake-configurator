@@ -2,7 +2,6 @@
   "name": "cupcake-configurator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://emoticakes.com/order-quote",
   "dependencies": {
     "@types/jest": "^24.0.23",
     "@types/node": "^12.12.8",
