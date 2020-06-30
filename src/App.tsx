@@ -245,7 +245,7 @@ function App() {
       {headerForSection('orderDate', 'When would you like your order?', moment(state.orderDate).format('LL'))}
       <Expand duration={animDuration} open={state.isEditingSection === 'orderDate'}>
         <div className="padded">
-          <p>You may submit a quote request for delivery 48 hours in advance or more. Before requesting a quote, please check my <a href="https://emoticakes.com/" target="_blank">availability calendar</a>.</p>
+          <p>Please try to submit a quote request for delivery 48 hours in advance or more. I'll do my best to accommodate your request based on my availability. </p>
           <DatePicker
             selected={state.orderDate}
             minDate={addDays(new Date(), 2)}
@@ -261,7 +261,7 @@ function App() {
     return <div>
       {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
-        <p className="bypassInstructions">This interactive section is here to help make choices fun! If it's confusing  or you don't see what you're looking for, skip to "Request a Quote" and tell me what you're looking for in the notes. See my <a href="https://emoticakes.com/gallery/" target="_blank">gallery</a> for inspiration.</p>
+        <p className="bypassInstructions">This interactive section is here to help make choices fun! If you don't see what you're looking for, just skip to "Request a Quote" and tell me what you're looking for in the notes. See <a href="https://emoticakes.com/" target="_blank">emoticakes.com</a>'s inspiration tab for examples or ideas.</p>
         <div className="padded orderCarousel">
           {state.orderDetails.map((item: orderItem) => (
             <div key={item.key} className="orderItem orderCard">
@@ -494,6 +494,18 @@ function App() {
         <div className="padded">
           <form className="quote-form">
             <ul>
+            <label>
+                <span>Special Notes or Custom Cakes</span>
+                <p className="specialReqInstructions">
+                  Did you select "custom" above, or do you have additional preferences for colors, gluten free or vegan flavors (available for some combinations), or specific design guidance? Please put those details here so I can best prepare a quote for you.
+                </p>
+                <input
+                  type="text"
+                  name="specialRequests"
+                  value={state.specialRequests}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
               <label>
                 <span>First Name</span>
                 <input
@@ -541,19 +553,6 @@ function App() {
                       <option key={i} value={referralSources[i]}>{referralSources[i]}</option>
                     ))}
                   </select>
-              </label>
-              <label>
-                <span>Any other special notes?</span>
-                <p className="specialReqInstructions">
-                  Let me know if you have any preferences for colors, gluten free or vegan flavors (available for some combinations), or specific design guidance. 
-                  Additional decoration may add to the cost, but let me know what you're looking for!
-                </p>
-                <input
-                  type="text"
-                  name="specialRequests"
-                  value={state.specialRequests}
-                  onChange={updateOrderContactDetails}
-                />
               </label>
             </ul>
             {!canSubmitOrder(state) && <p className="specialReqInstructions">To submit, fill our your contact information and either add an item in Order Details OR a special note above.</p>}

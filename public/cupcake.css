@@ -81,16 +81,16 @@ h4:hover, .orderCard .edit:hover, .quote-form button:hover {
     cursor: pointer;
 }
 h4.orderDate {
-    background-color: #F6B01199;
+    background-color: #F6B01166;
 }
 h4.deliveryOption {
-    background-color: #5CAD6C99;
+    background-color: #5CAD6C66;
 }
 h4.yourOrder {
-    background-color: #E0216D99;
+    background-color: #E0216D66;
 }
 h4.requestQuote {
-    background-color: #006D9E99;
+    background-color: #006D9E66;
 }
 h4 .chevron {
     position: relative;
