@@ -245,11 +245,12 @@ function App() {
       {headerForSection('orderDate', 'When would you like your order?', moment(state.orderDate).format('LL'))}
       <Expand duration={animDuration} open={state.isEditingSection === 'orderDate'}>
         <div className="padded">
-          <p>Please try to submit a quote request for delivery 48 hours in advance or more. I'll do my best to accommodate your request based on my availability. </p>
+          <p><b style={{ fontWeight: 'bold' }}>First, tell me when you'd like your order. Then, you'll be able to put in your order details.</b><br />Please try to submit a quote request for delivery 48 hours in advance or more. I'll do my best to accommodate your request based on my availability.</p>
           <DatePicker
             selected={state.orderDate}
             minDate={addDays(new Date(), 2)}
             onChange={date => updateOrderDate(date)}
+            placeholderText='mm/dd/yyyy'
             monthsShown={1}
           />
         </div>
@@ -258,7 +259,7 @@ function App() {
   }
 
   const orderDetailsSection = () => {
-    return <div>
+    return state.orderDate !== '' && <div>
       {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
         <p className="bypassInstructions">This interactive section is here to help make choices fun! If you don't see what you're looking for, just skip to "Request a Quote" and tell me what you're looking for in the notes. See <a href="https://emoticakes.com/" target="_blank">emoticakes.com</a>'s inspiration tab for examples or ideas.</p>
@@ -430,7 +431,7 @@ function App() {
   }
 
   const deliveryOptionsSection = () => {
-    return <div>
+    return state.orderDate !== '' && <div>
       {headerForSection('deliveryOption', 'Delivery Option', state.deliveryOption.name)}
       <Expand duration={animDuration} open={state.isEditingSection === 'deliveryOption'}>
         <div className="padded">
@@ -488,7 +489,7 @@ function App() {
   };
 
   const requestQuoteSection = () => {
-    return <div>
+    return state.orderDate !== '' && <div>
       {headerForSection('requestQuote', 'Request a Quote', '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'requestQuote'}>
         <div className="padded">

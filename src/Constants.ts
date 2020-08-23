@@ -358,7 +358,7 @@ export const defaultState = {
   fromEmail: '',
   fromPhone: '',
   specialRequests: '',
-  orderDate: addDays(new Date(), 2),
+  orderDate: '', // addDays(new Date(), 2),
   isEditingSection: 'orderDate', 
   isEditingItemKey: '',
   emailSubmitted: false,
