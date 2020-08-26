@@ -245,7 +245,7 @@ function App() {
       {headerForSection('orderDate', 'When would you like your order?', moment(state.orderDate).format('LL'))}
       <Expand duration={animDuration} open={state.isEditingSection === 'orderDate'}>
         <div className="padded">
-          <p><b style={{ fontWeight: 'bold' }}>First, tell me when you'd like your order. Then, you'll be able to put in your order details.</b><br />Please try to submit a quote request for delivery 48 hours in advance or more. I'll do my best to accommodate your request based on my availability.</p>
+          <p><b style={{ fontWeight: 'bold' }}>First, tell me when you'd like your order. My <a href="https://calendar.google.com/calendar/embed?src=mrc68tpj38rb49bj6ghuqh8v70@group.calendar.google.com&ctz=America/New_York" target='_blank'>availability calendar</a> will tell you if I'm booked on a specific date. Then, you'll be able to put in your order details.</b><br />Please try to submit a quote request for delivery 48 hours in advance or more. I'll do my best to accommodate your request based on my availability.</p>
           <DatePicker
             selected={state.orderDate}
             minDate={addDays(new Date(), 2)}
