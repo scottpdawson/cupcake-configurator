@@ -262,7 +262,7 @@ function App() {
     return state.orderDate !== '' && <div>
       {headerForSection('yourOrder', 'Order Details', state.orderTotal ? "$" + state.orderTotal.toFixed(2) : '')}
       <Expand duration={animDuration} open={state.isEditingSection === 'yourOrder'}>
-        <p className="bypassInstructions">This interactive section is here to help make choices fun! If you don't see what you're looking for, just skip to "Request a Quote" and tell me what you're looking for in the notes. See <a href="https://emoticakes.com/" target="_blank">emoticakes.com</a>'s inspiration tab for examples or ideas.</p>
+        <p className="bypassInstructions">This interactive section is here to help make choices fun. I have the most popular flavors in the choices. If you don’t see what you are looking for, just skip to "Request a Quote" and tell me what you’re looking for in the notes. See the <a href="https://emoticakes.com/" target="_blank">Emoticakes</a> inspiration section for examples and ideas. If you prefer to order by email, there is a link at the <a href="https://emoticakes.com/order">bottom of the order page</a> where you can email your request.</p>
         <div className="padded orderCarousel">
           {state.orderDetails.map((item: orderItem) => (
             <div key={item.key} className="orderItem orderCard">
