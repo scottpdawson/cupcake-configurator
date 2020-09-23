@@ -173,10 +173,6 @@ export const cakeFlavors: flavor[] = [{
     name: "chocolate",
     upCharge: 0,
   }, {
-    image: cakeDarkBrown,
-    name: "chocolate + vanilla",
-    upCharge: 0,
-  }, {
     image: cakeWhite,
     name: "coconut",
     upCharge: .25,

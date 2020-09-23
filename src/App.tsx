@@ -349,7 +349,6 @@ function App() {
                     {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                         <option key={i} 
                           value={cakeFlavors[i].name} 
-                          style={{display: (cakeFlavors[i].name !== 'chocolate + vanilla') || (item.size.id).includes("HALF") ? 'block': 'none'}}
                         >
                           {cakeFlavors[i].name}
                           {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
@@ -379,7 +378,6 @@ function App() {
                           {Object.keys(cakeFlavors).map((thisFlavor, i) => (
                               <option key={i} 
                                 value={cakeFlavors[i].name} 
-                                style={{display: (cakeFlavors[i].name !== 'chocolate + vanilla') || (item.size.id).includes("HALF") ? 'block': 'none'}}
                               >
                                 {cakeFlavors[i].name}
                                 {cakeFlavors[i].upCharge && item.size.cupcakesPerRow ? " (+$" + (cakeFlavors[i].upCharge * item.size.flavorMultiplier).toFixed(2) + " ea)" : ""}
