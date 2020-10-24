@@ -449,6 +449,12 @@ function App() {
   }
 
   const emailOrderRequest = (state: order) => {
+
+    let deliveryDetails = state.deliveryOption.name + " ($" + state.deliveryOption.price + ")";
+    if (state.deliveryOption.key !== 1) {
+      deliveryDetails += `<br />to ${state.recipientName} (${state.deliveryContactNumber})<br />${state.deliveryAddress}`;
+    }
+
     var templateParams = {
       from_name: state.fromFirstName + ' ' + state.fromLastName,
       from_email: state.fromEmail,
@@ -459,7 +465,7 @@ function App() {
         useAdditionalWeekYearTokens: true,
         useAdditionalDayOfYearTokens: true,
       }),
-      delivery: state.deliveryOption.name + " ($" + state.deliveryOption.price + ")",
+      delivery: deliveryDetails,
       total: state.orderTotal.toFixed(2),
       quote_details: summarizeOrder(state)
     };
@@ -486,6 +492,50 @@ function App() {
       );
   };
 
+  const deliveryDetailsSection = () => {
+    return state.orderDate !== '' && <div>
+      {headerForSection('deliveryDetails', 'Delivery Details', 'Delivery details required when order is placed')}
+      <Expand duration={animDuration} open={state.isEditingSection === 'deliveryDetails'}>
+        <div className="padded">
+          <form className="quote-form">
+            <p className="specialReqInstructions">
+              Please enter the delivery details for the recipient.
+            </p>
+            <ul>
+              <label>
+                <span>Recipient's Name</span>
+                <input
+                  type="text"
+                  name="recipientName"
+                  value={state.recipientName}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Delivery Address</span>
+                <input
+                  type="text"
+                  name="deliveryAddress"
+                  value={state.deliveryAddress}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+              <label>
+                <span>Delivery Contact Phone Number</span>
+                <input
+                  type="phone"
+                  name="deliveryContactNumber"
+                  value={state.deliveryContactNumber}
+                  onChange={updateOrderContactDetails}
+                />
+              </label>
+            </ul>
+          </form>
+        </div>
+      </Expand>
+    </div>;
+  }
+
   const requestQuoteSection = () => {
     return state.orderDate !== '' && <div>
       {headerForSection('requestQuote', 'Request a Quote', '')}
@@ -506,7 +556,7 @@ function App() {
                 />
               </label>
               <label>
-                <span>First Name</span>
+                <span>Your First Name</span>
                 <input
                   type="text"
                   name="fromFirstName"
@@ -515,7 +565,7 @@ function App() {
                 />
               </label>
               <label>
-                <span>Last Name</span>
+                <span>Your Last Name</span>
                 <input
                   type="text"
                   name="fromLastName"
@@ -524,7 +574,7 @@ function App() {
                 />
               </label>
               <label>
-                <span>Email</span>
+                <span>Your Email Address</span>
                 <input
                   type="email"
                   name="fromEmail"
@@ -533,7 +583,7 @@ function App() {
                 />
               </label>
               <label>
-                <span>Phone</span>
+                <span>Your Phone Number</span>
                 <input
                   type="phone"
                   name="fromPhone"
@@ -554,7 +604,7 @@ function App() {
                   </select>
               </label>
             </ul>
-            {!canSubmitOrder(state) && <p className="specialReqInstructions">To submit, fill our your contact information and either add an item in Order Details OR a special note above.</p>}
+            {!canSubmitOrder(state) && <p className="specialReqInstructions">To submit, fill our your contact information and either add an item in Order Details OR a special note above. If you chose delivery, those details are also due at time of ordering.</p>}
             <button
               type="button"
               disabled={!canSubmitOrder(state)}
@@ -585,6 +635,7 @@ function App() {
         {orderDateSection()}
         {orderDetailsSection()}
         {deliveryOptionsSection()}
+        {state.deliveryOption.key !== 1 && deliveryDetailsSection()}
         {requestQuoteSection()}
       </div>}
       {(state.emailSubmitted && state.emailError === '') && <div className="emailResult">

@@ -92,6 +92,9 @@ h4.yourOrder {
 h4.requestQuote {
     background-color: #006D9E66;
 }
+h4.deliveryDetails {
+    background-color: #cccccc66;
+}
 h4 .chevron {
     position: relative;
     top: 2px;

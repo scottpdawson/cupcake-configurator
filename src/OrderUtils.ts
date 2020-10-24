@@ -55,11 +55,21 @@ export const summarizeOrder = (state: order) => {
 export const canSubmitOrder = (state: order) => {
     // validate whether we can submit the form or not
     // ensure user filled out all contact info
+    const clearForDelivery = (
+      state.deliveryOption.key === 1 || 
+      (state.deliveryOption.key !== 1 && 
+        state.recipientName && 
+        state.deliveryAddress && 
+        state.deliveryContactNumber
+      )
+    );
+
     return (
       state.fromFirstName &&
       state.fromLastName &&
       state.fromEmail &&
       state.fromPhone && 
+      clearForDelivery &&
       (state.orderTotal > 0 || state.specialRequests)
     );
   };

@@ -15,6 +15,9 @@ export interface order {
   emailSubmitted: boolean;
   emailError: string;
   referralSource: string;
+  recipientName: string;
+  deliveryAddress: string;
+  deliveryContactNumber: string;
 }
 
 export interface orderItem {
@@ -360,4 +363,7 @@ export const defaultState = {
   emailSubmitted: false,
   emailError: '',
   referralSource: referralSources[0],
+  recipientName: '',
+  deliveryAddress: '',
+  deliveryContactNumber: '',
 };
