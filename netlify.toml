@@ -1,0 +1,4 @@
+[[redirects]]
+  from = "/"
+  to = "https://emoticakes.com/order"
+  force = true
