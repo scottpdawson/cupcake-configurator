@@ -11,7 +11,7 @@
     "emailjs-com": "^2.4.1",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "popper.js": "^1.15.0",
     "react": "^16.8.6",
     "react-animated-css": "^1.2.1",
