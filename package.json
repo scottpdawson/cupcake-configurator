@@ -20,7 +20,7 @@
     "react-expand-animated": "^1.0.1",
     "react-icons": "^3.8.0",
     "react-moment": "^0.9.7",
-    "react-scripts": "2.1.8",
+    "react-scripts": "5.0.1",
     "typescript": "^3.7.2",
     "velocity-animate": "^1.5.2",
     "velocity-react": "^1.4.3"
